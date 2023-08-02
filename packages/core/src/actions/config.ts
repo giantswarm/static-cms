@@ -5,7 +5,7 @@ import trimStart from 'lodash/trimStart';
 import yaml from 'yaml';
 
 import { resolveBackend } from '@staticcms/core/backend';
-import { CONFIG_FAILURE, CONFIG_REQUEST, CONFIG_SUCCESS } from '../constants';
+import {BRANCH_SWITCH, CONFIG_FAILURE, CONFIG_REQUEST, CONFIG_SUCCESS} from '../constants';
 import validateConfig from '../constants/configSchema';
 import {
   I18N,
@@ -14,6 +14,10 @@ import {
   I18N_STRUCTURE_SINGLE_FILE,
 } from '../lib/i18n';
 import { selectDefaultSortableFields } from '../lib/util/collection.util';
+import {store} from "../store";
+import {loadBranches} from "@staticcms/core/actions/branches";
+import {discardDraft, entriesClear} from "@staticcms/core/actions/entries";
+import {authenticateUser} from "@staticcms/core/actions/auth";
 
 import type { AnyAction } from 'redux';
 import type { ThunkDispatch } from 'redux-thunk';
@@ -125,6 +129,37 @@ function throwOnMissingDefaultLocale(i18n?: I18nInfo) {
         i18n.defaultLocale
       }`,
     );
+  }
+}
+
+export function switchedBranch(branch: string) {
+  return {type: BRANCH_SWITCH, branch} as const;
+}
+
+export function switchBranch(branch: string) {
+  const url = new URL(window.location.href);
+  url.searchParams.set('branch', branch);
+  history.replaceState(null, '', url);
+
+  const finishSwitch = () => {
+    store.dispatch(switchedBranch(branch));
+    store.dispatch(discardDraft());
+    store.dispatch(entriesClear());
+    store.dispatch(loadBranches() as unknown as AnyAction);
+  };
+
+  const loadConfigAction = loadConfig(undefined, function onLoad(config) {
+    if (config.backend.name !== 'git-gateway') {
+      store.dispatch(authenticateUser() as unknown as AnyAction);
+    }
+    finishSwitch();
+  }) as AnyAction;
+
+  // loadConfig() does return CONFIG_SUCCESS early if a programmatic config was provided,
+  // ensure branch switch is still completed.
+  store.dispatch(loadConfigAction);
+  if (loadConfigAction.type === 'CONFIG_SUCCESS') {
+    finishSwitch();
   }
 }
 
@@ -273,8 +308,16 @@ export function applyDefaults<EF extends BaseField = UnknownField>(
         };
       });
     }
+
+    if (config.backend.name === 'github') {
+      const baseBranch = new URLSearchParams(window.location.search).get('branch');
+      if (baseBranch) {
+        config.backend.branch = baseBranch;
+      }
+    }
   });
 }
+
 
 export function parseConfig(data: string) {
   const config = yaml.parse(data, { maxAliasCount: -1, prettyErrors: true, merge: true });
@@ -418,5 +461,5 @@ export function loadConfig(manualConfig: Config | undefined, onLoad: (config: Co
 }
 
 export type ConfigAction = ReturnType<
-  typeof configLoading | typeof configLoaded | typeof configFailed
+  typeof switchedBranch | typeof configLoading | typeof configLoaded | typeof configFailed
 >;

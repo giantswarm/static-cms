@@ -10,11 +10,13 @@ import medias from './medias';
 import scroll from './scroll';
 import search from './search';
 import status from './status';
+import branches from './branches';
 
 const reducers = {
   auth,
   collections,
   config,
+  branches,
   cursors,
   entries,
   entryDraft,

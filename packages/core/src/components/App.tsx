@@ -31,11 +31,14 @@ import MediaPage from './media-library/MediaPage';
 import NotFoundPage from './NotFoundPage';
 import Page from './page/Page';
 import Snackbars from './snackbar/Snackbars';
+import {loadBranches} from "@staticcms/core/actions/branches";
 
+import type {AnyAction} from "redux";
 import type { Credentials, TranslatedProps } from '@staticcms/core/interface';
 import type { RootState } from '@staticcms/core/store';
 import type { ComponentType } from 'react';
 import type { ConnectedProps } from 'react-redux';
+
 
 TopBarProgress.config({
   barColors: {
@@ -65,6 +68,7 @@ const App = ({
   user,
   config,
   collections,
+  branches,
   loginUser,
   isFetching,
   t,
@@ -250,6 +254,12 @@ const App = ({
     });
   }, []);
 
+  useEffect(() => {
+    if (user && !branches.isFetching && !branches.branches) {
+      dispatch(loadBranches() as unknown as AnyAction);
+    }
+  }, [dispatch, user, isFetching, branches]);
+
   if (!config.config) {
     return configError(t('app.app.configNotFound'));
   }
@@ -282,7 +292,7 @@ const App = ({
 };
 
 function mapStateToProps(state: RootState) {
-  const { auth, config, collections, globalUI, scroll } = state;
+  const { auth, config, collections, branches, globalUI, scroll } = state;
   const user = auth.user;
   const isFetching = globalUI.isFetching;
   const scrollSyncEnabled = scroll.isScrolling;
@@ -290,6 +300,7 @@ function mapStateToProps(state: RootState) {
     auth,
     config,
     collections,
+    branches,
     user,
     isFetching,
     scrollSyncEnabled,

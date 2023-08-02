@@ -674,6 +674,8 @@ export type ReposGetBranchResponse = {
   protection_url: string;
 };
 
+export type ReposGetBranchesResponse = ReposGetBranchResponse[];
+
 type GitCreateTreeResponseTreeItem = {
   mode: string;
   path: string;
@@ -687,4 +689,12 @@ export type GitCreateTreeResponse = {
   sha: string;
   tree: Array<GitCreateTreeResponseTreeItem>;
   url: string;
+};
+
+export type GitCreatePullResponse = {
+  url: string;
+  number: number;
+  title: string;
+  html_url: string;
+  diff_url: string;
 };
