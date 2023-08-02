@@ -6,6 +6,7 @@ import {
   ENTRIES_FAILURE,
   ENTRIES_REQUEST,
   ENTRIES_SUCCESS,
+  ENTRIES_CLEAR,
   ENTRY_DELETE_SUCCESS,
   ENTRY_FAILURE,
   ENTRY_PERSIST_SUCCESS,
@@ -223,6 +224,13 @@ function entries(
       }
 
       return { ...state, pages };
+    }
+
+    case ENTRIES_CLEAR: {
+      clearSort();
+      return {
+        entities: {}, pages: {}, sort: loadSort(), viewStyle: loadViewStyle()
+      };
     }
 
     case ENTRY_FAILURE: {

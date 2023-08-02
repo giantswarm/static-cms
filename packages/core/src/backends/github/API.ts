@@ -18,6 +18,7 @@ import {
   requestWithBackoff,
   unsentRequest,
 } from '@staticcms/core/lib/util';
+import {switchBranch} from "@staticcms/core/actions/config";
 
 import type { DataFile, PersistOptions } from '@staticcms/core/interface';
 import type { ApiRequest, FetchError } from '@staticcms/core/lib/util';
@@ -37,6 +38,7 @@ import type {
   ReposGetBranchResponse,
   ReposGetResponse,
   ReposListCommitsResponse,
+  GitCreatePullResponse, ReposGetBranchesResponse,
 } from './types';
 
 export const API_NAME = 'GitHub';
@@ -45,6 +47,7 @@ export interface Config {
   apiRoot?: string;
   token?: string;
   branch?: string;
+  is_feature_branch?: string;
   repo?: string;
   originRepo?: string;
 }
@@ -377,18 +380,48 @@ export default class API {
     }
   }
 
+  generateEditLink(targetBranch: string) {
+    const url = new URL(window.location.href);
+    url.searchParams.set('branch', targetBranch);
+    return ''+url;
+  }
+
   async persistFiles(dataFiles: DataFile[], mediaFiles: AssetProxy[], options: PersistOptions) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const files: (DataFile | AssetProxy)[] = mediaFiles.concat(dataFiles as any);
     const uploadPromises = files.map(file => this.uploadBlob(file));
     await Promise.all(uploadPromises);
 
+    const createBranchName = (login: string) => {
+      const pathSlug = (dataFiles[0]?.path || mediaFiles[0]?.path || '').toLowerCase().replace(/[^/\-_.a-z0-9]+/g, '-');
+      return `change-${pathSlug}-by-${login}-at-${Math.round(Date.now() / 1000)}`;
+    };
+
     return (
-      this.getDefaultBranch()
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        .then(branchData => this.updateTree(branchData.commit.sha, files as any))
-        .then(changeTree => this.commit(options.commitMessage, changeTree))
-        .then(response => this.patchBranch(this.branch, response.sha))
+      this.user()
+        .then(user => {
+            return this.getDefaultBranch()
+              .then(branchData => {
+                const targetBranch = branchData.protected ? createBranchName(user.login) : this.branch;
+
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                return this.updateTree(branchData.commit.sha, files as any)
+                  .then(changeTree => this.commit(options.commitMessage, changeTree))
+                  .then(response => this.createBranch(targetBranch, response.sha)
+                    .catch(e => e.status === 409 || e.status === 422 ? this.patchBranch(targetBranch, response.sha) : Promise.reject(e))
+                    .then(() => branchData.protected
+                        ? this.createPull(targetBranch.replace(/-/g, ' '),
+                          options.commitMessage + `\n\n**[Edit this PR](${this.generateEditLink(targetBranch)})**`, targetBranch, this.branch)
+                          .then(() => {
+                            switchBranch(targetBranch);
+                            return response;
+                          })
+                        : Promise.resolve(response))
+                    .catch(e => e.status === 409 || e.status === 422 ? Promise.resolve(response) : Promise.reject(e))
+                )
+              });
+          }
+        )
     );
   }
 
@@ -454,12 +487,32 @@ export default class API {
     return result;
   }
 
+  createBranch(branchName: string, sha: string) {
+    return this.createRef('heads', branchName, sha);
+  }
+
   patchBranch(branchName: string, sha: string) {
     return this.patchRef('heads', branchName, sha);
   }
 
+  async getBranches() {
+    const result: ReposGetBranchesResponse = await this.request(
+      `${this.originRepoURL}/branches`,
+    );
+    return result;
+  }
+
   async getHeadReference(head: string) {
     return `${this.repoOwner}:${head}`;
+  }
+
+  async createPull(title: string, body: string, head: string, base: string) {
+    const result: GitCreatePullResponse = await this.request(`${this.repoURL}/pulls`, {
+        method: 'POST',
+        body: JSON.stringify({title, body, head, base}),
+      },
+    );
+    return result;
   }
 
   toBase64(str: string) {

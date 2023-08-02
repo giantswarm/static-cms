@@ -1,4 +1,4 @@
-import { CONFIG_SUCCESS } from '../constants';
+import {CONFIG_SUCCESS} from '../constants';
 
 import type { ConfigAction } from '../actions/config';
 import type { BaseField, Collection, Collections, UnknownField } from '../interface';
