@@ -3,7 +3,6 @@ import {GitHubBackend} from "@staticcms/core";
 import {LOAD_BRANCHES_FAILURE, LOAD_BRANCHES_REQUEST, LOAD_BRANCHES_SUCCESS} from '../constants';
 import {currentBackend} from "@staticcms/core/backend";
 
-import type GitHub from "@staticcms/core/backends/github/implementation";
 import type {ThunkDispatch} from "redux-thunk";
 import type {RootState} from "@staticcms/core/store";
 import type {AnyAction} from "redux";
@@ -46,7 +45,7 @@ export function loadBranches() {
       return;
     }
 
-    const gitHubBackend = (backend.implementation as GitHub);
+    const gitHubBackend = backend.implementation;
 
     dispatch(branchesLoading());
     try {

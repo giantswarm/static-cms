@@ -38,7 +38,7 @@ const config = (state: ConfigState = defaultState, action: ConfigAction) => {
       if (nextState.config) {
         const backend = currentBackend(nextState.config);
         if (backend && backend.implementation instanceof GitHub) {
-          (backend.implementation as GitHub).setBranch(action.branch);
+          backend.implementation.setBranch(action.branch);
         }
       }
 
