@@ -18,3 +18,7 @@ export function selectIsSearchEnabled(state: RootState) {
 export function selectDisplayUrl(state: RootState) {
   return state.config.config?.display_url;
 }
+
+export function selectBackendBranch(state: RootState) {
+  return state.config.config?.backend?.branch || '';
+}
