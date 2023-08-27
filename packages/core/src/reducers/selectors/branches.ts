@@ -2,5 +2,5 @@
 import type { RootState } from '@staticcms/core/store';
 
 export const selectBranches = (state: RootState) => {
-  return state.branches;
+  return state.branches.branches;
 };
