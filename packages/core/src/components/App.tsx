@@ -33,7 +33,6 @@ import Page from './page/Page';
 import Snackbars from './snackbar/Snackbars';
 import {loadBranches} from "@staticcms/core/actions/branches";
 
-import type {AnyAction} from "redux";
 import type { Credentials, TranslatedProps } from '@staticcms/core/interface';
 import type { RootState } from '@staticcms/core/store';
 import type { ComponentType } from 'react';

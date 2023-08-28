@@ -15,7 +15,7 @@ import ErrorBoundary from './components/ErrorBoundary';
 import addExtensions from './extensions';
 import { getPhrases } from './lib/phrases';
 import { selectLocale } from './reducers/selectors/config';
-import { store } from './store';
+import {AppDispatch, store} from './store';
 import useMeta from './lib/hooks/useMeta';
 
 import type { AnyAction } from '@reduxjs/toolkit';
@@ -76,6 +76,7 @@ function bootstrap<F extends BaseField = UnknownField>(opts?: {
   config?: Config<F>;
   autoInitialize?: boolean;
 }) {
+  const dispatch: AppDispatch = store.dispatch;
   const { config, autoInitialize = true } = opts ?? {};
 
   /**
@@ -110,10 +111,10 @@ function bootstrap<F extends BaseField = UnknownField>(opts?: {
     addExtensions();
   }
 
-  store.dispatch(
+  dispatch(
     loadConfig(config as Config | undefined, function onLoad(config) {
       if (config.backend.name !== 'git-gateway') {
-        store.dispatch(authenticateUser() as unknown as AnyAction);
+        dispatch(authenticateUser());
       }
     }) as AnyAction,
   );
