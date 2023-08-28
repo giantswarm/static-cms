@@ -25,9 +25,6 @@ const config = (state: ConfigState = defaultState, action: ConfigAction) => {
         config: state.config ?
         {
           ...state.config,
-          collections: {
-            ...state.config.collections
-          },
           backend: {
             ...state.config.backend,
             branch: action.branch
