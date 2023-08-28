@@ -147,19 +147,19 @@ export function switchBranch(branch: string) {
     dispatch(switchedBranch(branch));
     dispatch(discardDraft());
     dispatch(entriesClear());
-    dispatch(loadBranches() as unknown as AnyAction);
+    dispatch(loadBranches());
   };
 
   const loadConfigAction = loadConfig(undefined, function onLoad(config) {
     if (config.backend.name !== 'git-gateway') {
-      dispatch(authenticateUser() as unknown as AnyAction);
+      dispatch(authenticateUser());
     }
     finishSwitch();
   });
 
   // loadConfig() does return CONFIG_SUCCESS early if a programmatic config was provided,
   // ensure branch switch is still completed.
-  dispatch(loadConfigAction as AnyAction);
+  dispatch(loadConfigAction);
   if (typeof loadConfigAction !== 'function' && loadConfigAction.type === 'CONFIG_SUCCESS') {
     finishSwitch();
   }

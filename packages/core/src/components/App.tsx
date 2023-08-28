@@ -36,7 +36,6 @@ import {loadBranches} from "../actions/branches";
 import ThemeManager from './theme/ThemeManager';
 import useTheme from './theme/hooks/useTheme';
 
-import type {AnyAction} from "redux";
 import type { Credentials, TranslatedProps } from '@staticcms/core/interface';
 import type { RootState } from '@staticcms/core/store';
 import type { ComponentType } from 'react';
