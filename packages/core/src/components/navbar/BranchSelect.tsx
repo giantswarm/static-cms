@@ -17,8 +17,12 @@ const BranchSelect: FC<TranslatedProps<{}>> = ({t}) => {
   const branch = useAppSelector(selectBackendBranch);
 
   const handleBranchSelection: SelectChangeEventHandler = useCallback(
-    (value) => switchBranch(value.toString()),
-    [],
+(value) => {
+        if (typeof value === "string") {
+          switchBranch(value);
+        }
+      },
+[],
   );
 
   return (
@@ -32,6 +36,7 @@ const BranchSelect: FC<TranslatedProps<{}>> = ({t}) => {
         onChange={handleBranchSelection}
         value={branch}
         placeholder=''
+        required={true}
         options={(branches || []).map(branch => branch.name)}
       />
     </div>
