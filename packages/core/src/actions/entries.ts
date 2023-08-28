@@ -35,7 +35,8 @@ import {
   SORT_DIRECTION_ASCENDING,
   SORT_ENTRIES_FAILURE,
   SORT_ENTRIES_REQUEST,
-  SORT_ENTRIES_SUCCESS, ENTRIES_CLEAR,
+  SORT_ENTRIES_SUCCESS,
+  ENTRIES_CLEAR,
 } from '../constants';
 import ValidationErrorTypes from '../constants/validationErrorTypes';
 import { hasI18n, serializeI18n } from '../lib/i18n';

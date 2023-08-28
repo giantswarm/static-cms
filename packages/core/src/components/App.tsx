@@ -32,7 +32,7 @@ import EditorRoute from './entry-editor/EditorRoute';
 import MediaPage from './media-library/MediaPage';
 import Page from './page/Page';
 import Snackbars from './snackbar/Snackbars';
-import {loadBranches} from "../actions/branches";
+import {loadBranches} from '../actions/branches';
 import ThemeManager from './theme/ThemeManager';
 import useTheme from './theme/hooks/useTheme';
 

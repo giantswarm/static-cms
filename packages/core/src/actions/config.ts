@@ -5,7 +5,7 @@ import trimStart from 'lodash/trimStart';
 import yaml from 'yaml';
 
 import { resolveBackend } from '@staticcms/core/backend';
-import {BRANCH_SWITCH, CONFIG_FAILURE, CONFIG_REQUEST, CONFIG_SUCCESS} from '../constants';
+import { BRANCH_SWITCH, CONFIG_FAILURE, CONFIG_REQUEST, CONFIG_SUCCESS } from '../constants';
 import validateConfig from '../constants/configSchema';
 import {
   I18N,
@@ -14,10 +14,10 @@ import {
   I18N_STRUCTURE_SINGLE_FILE,
 } from '../lib/i18n';
 import { selectDefaultSortableFields } from '../lib/util/collection.util';
-import {store} from "../store";
-import {loadBranches} from "@staticcms/core/actions/branches";
-import {discardDraft, entriesClear} from "@staticcms/core/actions/entries";
-import {authenticateUser} from "@staticcms/core/actions/auth";
+import { store } from '../store';
+import { loadBranches } from '@staticcms/core/actions/branches';
+import { discardDraft, entriesClear } from '@staticcms/core/actions/entries';
+import { authenticateUser } from '@staticcms/core/actions/auth';
 
 import type { AnyAction } from 'redux';
 import type { ThunkDispatch } from 'redux-thunk';
@@ -133,7 +133,7 @@ function throwOnMissingDefaultLocale(i18n?: I18nInfo) {
 }
 
 export function switchedBranch(branch: string) {
-  return {type: BRANCH_SWITCH, branch} as const;
+  return { type: BRANCH_SWITCH, branch } as const;
 }
 
 export function switchBranch(branch: string) {
@@ -325,7 +325,6 @@ export function applyDefaults<EF extends BaseField = UnknownField>(
     }
   });
 }
-
 
 export function parseConfig(data: string) {
   const config = yaml.parse(data, { maxAliasCount: -1, prettyErrors: true, merge: true });

@@ -18,7 +18,7 @@ import {
   requestWithBackoff,
   unsentRequest,
 } from '@staticcms/core/lib/util';
-import {switchBranch} from "@staticcms/core/actions/config";
+import { switchBranch } from '@staticcms/core/actions/config';
 
 import type { DataFile, PersistOptions } from '@staticcms/core/interface';
 import type { ApiRequest, FetchError } from '@staticcms/core/lib/util';
@@ -38,7 +38,8 @@ import type {
   ReposGetBranchResponse,
   ReposGetResponse,
   ReposListCommitsResponse,
-  GitCreatePullResponse, ReposGetBranchesResponse,
+  GitCreatePullResponse,
+  ReposGetBranchesResponse,
 } from './types';
 
 export const API_NAME = 'GitHub';
@@ -383,7 +384,7 @@ export default class API {
   generateEditLink(targetBranch: string) {
     const url = new URL(window.location.href);
     url.searchParams.set('branch', targetBranch);
-    return ''+url;
+    return '' + url;
   }
 
   async persistFiles(dataFiles: DataFile[], mediaFiles: AssetProxy[], options: PersistOptions) {
@@ -393,7 +394,9 @@ export default class API {
     await Promise.all(uploadPromises);
 
     const createBranchName = (login: string) => {
-      const pathSlug = (dataFiles[0]?.path || mediaFiles[0]?.path || '').toLowerCase().replace(/[^/\-_.a-z0-9]+/g, '-');
+      const pathSlug = (dataFiles[0]?.path || mediaFiles[0]?.path || '')
+        .toLowerCase()
+        .replace(/[^/\-_.a-z0-9]+/g, '-');
       return `change-${pathSlug}-by-${login}-at-${Math.round(Date.now() / 1000)}`;
     };
 
@@ -405,8 +408,7 @@ export default class API {
     const commitResponse = await this.commit(options.commitMessage, changeTree);
     try {
       await this.createBranch(targetBranch, commitResponse.sha);
-    }
-    catch (e) {
+    } catch (e) {
       if (e instanceof APIError && (e.status === 409 || e.status === 422)) {
         await this.patchBranch(targetBranch, commitResponse.sha);
       } else {
@@ -415,12 +417,12 @@ export default class API {
     }
 
     if (branchData.protected) {
-      const body = options.commitMessage + `\n\n**[Edit this PR](${this.generateEditLink(targetBranch)})**`;
+      const body =
+        options.commitMessage + `\n\n**[Edit this PR](${this.generateEditLink(targetBranch)})**`;
       try {
         await this.createPull(targetBranch.replace(/-/g, ' '), body, targetBranch, this.branch);
         switchBranch(targetBranch);
-      }
-      catch (e) {
+      } catch (e) {
         if (e instanceof APIError && e.status !== 409 && e.status !== 422) {
           throw e;
         }
@@ -501,9 +503,7 @@ export default class API {
   }
 
   async getBranches() {
-    const result: ReposGetBranchesResponse = await this.request(
-      `${this.originRepoURL}/branches`,
-    );
+    const result: ReposGetBranchesResponse = await this.request(`${this.originRepoURL}/branches`);
     return result;
   }
 
@@ -513,10 +513,9 @@ export default class API {
 
   async createPull(title: string, body: string, head: string, base: string) {
     const result: GitCreatePullResponse = await this.request(`${this.repoURL}/pulls`, {
-        method: 'POST',
-        body: JSON.stringify({title, body, head, base}),
-      },
-    );
+      method: 'POST',
+      body: JSON.stringify({ title, body, head, base }),
+    });
     return result;
   }
 
