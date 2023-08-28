@@ -256,7 +256,7 @@ const App = ({
 
   useEffect(() => {
     if (user && !branches.isFetching && !branches.branches) {
-      dispatch(loadBranches() as unknown as AnyAction);
+      dispatch(loadBranches());
     }
   }, [dispatch, user, isFetching, branches]);
 
