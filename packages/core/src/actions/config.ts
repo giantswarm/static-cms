@@ -155,12 +155,12 @@ export function switchBranch(branch: string) {
       dispatch(authenticateUser() as unknown as AnyAction);
     }
     finishSwitch();
-  }) as AnyAction;
+  });
 
   // loadConfig() does return CONFIG_SUCCESS early if a programmatic config was provided,
   // ensure branch switch is still completed.
-  dispatch(loadConfigAction);
-  if (loadConfigAction.type === 'CONFIG_SUCCESS') {
+  dispatch(loadConfigAction as AnyAction);
+  if (typeof loadConfigAction !== 'function' && loadConfigAction.type === 'CONFIG_SUCCESS') {
     finishSwitch();
   }
 }
