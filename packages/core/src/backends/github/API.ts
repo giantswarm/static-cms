@@ -397,32 +397,37 @@ export default class API {
       return `change-${pathSlug}-by-${login}-at-${Math.round(Date.now() / 1000)}`;
     };
 
-    return (
-      this.user()
-        .then(user => {
-            return this.getDefaultBranch()
-              .then(branchData => {
-                const targetBranch = branchData.protected ? createBranchName(user.login) : this.branch;
+    const user = await this.user();
+    const branchData = await this.getDefaultBranch();
+    const targetBranch = branchData.protected ? createBranchName(user.login) : this.branch;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const changeTree = await this.updateTree(branchData.commit.sha, files as any);
+    const commitResponse = await this.commit(options.commitMessage, changeTree);
+    try {
+      await this.createBranch(targetBranch, commitResponse.sha);
+    }
+    catch (e) {
+      if (e instanceof APIError && (e.status === 409 || e.status === 422)) {
+        await this.patchBranch(targetBranch, commitResponse.sha);
+      } else {
+        throw e;
+      }
+    }
 
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                return this.updateTree(branchData.commit.sha, files as any)
-                  .then(changeTree => this.commit(options.commitMessage, changeTree))
-                  .then(response => this.createBranch(targetBranch, response.sha)
-                    .catch(e => e.status === 409 || e.status === 422 ? this.patchBranch(targetBranch, response.sha) : Promise.reject(e))
-                    .then(() => branchData.protected
-                        ? this.createPull(targetBranch.replace(/-/g, ' '),
-                          options.commitMessage + `\n\n**[Edit this PR](${this.generateEditLink(targetBranch)})**`, targetBranch, this.branch)
-                          .then(() => {
-                            switchBranch(targetBranch);
-                            return response;
-                          })
-                        : Promise.resolve(response))
-                    .catch(e => e.status === 409 || e.status === 422 ? Promise.resolve(response) : Promise.reject(e))
-                )
-              });
-          }
-        )
-    );
+    if (branchData.protected) {
+      const body = options.commitMessage + `\n\n**[Edit this PR](${this.generateEditLink(targetBranch)})**`;
+      try {
+        await this.createPull(targetBranch.replace(/-/g, ' '), body, targetBranch, this.branch);
+        switchBranch(targetBranch);
+      }
+      catch (e) {
+        if (e instanceof APIError && e.status !== 409 && e.status !== 422) {
+          throw e;
+        }
+      }
+    }
+
+    return commitResponse;
   }
 
   async getFileSha(path: string, { repoURL = this.repoURL, branch = this.branch } = {}) {
