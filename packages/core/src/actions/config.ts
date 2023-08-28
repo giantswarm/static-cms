@@ -31,7 +31,7 @@ import type {
   LocalBackend,
   UnknownField,
 } from '../interface';
-import type { RootState } from '../store';
+import type { AppDispatch, RootState } from '../store';
 
 function traverseFields(fields: Field[], updater: (field: Field) => Field): Field[] {
   return fields.map(field => {
@@ -137,27 +137,29 @@ export function switchedBranch(branch: string) {
 }
 
 export function switchBranch(branch: string) {
+  const dispatch: AppDispatch = store.dispatch;
+
   const url = new URL(window.location.href);
   url.searchParams.set('branch', branch);
   history.replaceState(null, '', url);
 
   const finishSwitch = () => {
-    store.dispatch(switchedBranch(branch));
-    store.dispatch(discardDraft());
-    store.dispatch(entriesClear());
-    store.dispatch(loadBranches() as unknown as AnyAction);
+    dispatch(switchedBranch(branch));
+    dispatch(discardDraft());
+    dispatch(entriesClear());
+    dispatch(loadBranches() as unknown as AnyAction);
   };
 
   const loadConfigAction = loadConfig(undefined, function onLoad(config) {
     if (config.backend.name !== 'git-gateway') {
-      store.dispatch(authenticateUser() as unknown as AnyAction);
+      dispatch(authenticateUser() as unknown as AnyAction);
     }
     finishSwitch();
   }) as AnyAction;
 
   // loadConfig() does return CONFIG_SUCCESS early if a programmatic config was provided,
   // ensure branch switch is still completed.
-  store.dispatch(loadConfigAction);
+  dispatch(loadConfigAction);
   if (loadConfigAction.type === 'CONFIG_SUCCESS') {
     finishSwitch();
   }
