@@ -1,12 +1,11 @@
 import {
   LOAD_BRANCHES_FAILURE,
   LOAD_BRANCHES_REQUEST,
-  LOAD_BRANCHES_SUCCESS
-} from "@staticcms/core/constants";
+  LOAD_BRANCHES_SUCCESS,
+} from '@staticcms/core/constants';
 
-import type {BranchesAction} from '../actions/branches';
-import type {SelectField} from '../interface';
-
+import type { BranchesAction } from '../actions/branches';
+import type { SelectField } from '../interface';
 
 export interface Branch {
   name: string;
@@ -19,17 +18,14 @@ export interface BranchesState extends SelectField {
 }
 
 const defaultState: BranchesState = {
-  name: "branches",
+  name: 'branches',
   options: [],
   multiple: false,
-  widget: "select",
-  isFetching: false
+  widget: 'select',
+  isFetching: false,
 };
 
-function branches(
-  state: BranchesState = defaultState,
-  action: BranchesAction,
-): BranchesState {
+function branches(state: BranchesState = defaultState, action: BranchesAction): BranchesState {
   switch (action.type) {
     case LOAD_BRANCHES_REQUEST:
       return {

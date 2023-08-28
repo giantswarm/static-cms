@@ -15,13 +15,13 @@ import ErrorBoundary from './components/ErrorBoundary';
 import addExtensions from './extensions';
 import { getPhrases } from './lib/phrases';
 import { selectLocale } from './reducers/selectors/config';
-import {AppDispatch, store} from './store';
+import { store } from './store';
 import useMeta from './lib/hooks/useMeta';
 
 import type { AnyAction } from '@reduxjs/toolkit';
 import type { ConnectedProps } from 'react-redux';
 import type { BaseField, Config, UnknownField } from './interface';
-import type { RootState } from './store';
+import type { RootState, AppDispatch } from './store';
 
 import './styles/datetime/calendar.css';
 import './styles/datetime/clock.css';

@@ -229,7 +229,10 @@ function entries(
     case ENTRIES_CLEAR: {
       clearSort();
       return {
-        entities: {}, pages: {}, sort: loadSort(), viewStyle: loadViewStyle()
+        entities: {},
+        pages: {},
+        sort: loadSort(),
+        viewStyle: loadViewStyle(),
       };
     }
 

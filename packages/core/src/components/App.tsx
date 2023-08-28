@@ -31,13 +31,12 @@ import MediaPage from './media-library/MediaPage';
 import NotFoundPage from './NotFoundPage';
 import Page from './page/Page';
 import Snackbars from './snackbar/Snackbars';
-import {loadBranches} from "@staticcms/core/actions/branches";
+import { loadBranches } from '@staticcms/core/actions/branches';
 
 import type { Credentials, TranslatedProps } from '@staticcms/core/interface';
 import type { RootState } from '@staticcms/core/store';
 import type { ComponentType } from 'react';
 import type { ConnectedProps } from 'react-redux';
-
 
 TopBarProgress.config({
   barColors: {

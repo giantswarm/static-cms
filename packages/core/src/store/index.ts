@@ -6,9 +6,9 @@ import { waitUntilAction } from './middleware/waitUntilAction';
 import type { BaseField, UnknownField } from '../interface';
 import type { CollectionsState } from '../reducers/collections';
 import type { ConfigState } from '../reducers/config';
-import type {BranchesState} from "@staticcms/core/reducers/branches";
-import type {ThunkDispatch} from "redux-thunk";
-import type {AnyAction} from "redux";
+import type { BranchesState } from '@staticcms/core/reducers/branches';
+import type { ThunkDispatch } from 'redux-thunk';
+import type { AnyAction } from 'redux';
 
 const store = configureStore({
   reducer: createRootReducer(),

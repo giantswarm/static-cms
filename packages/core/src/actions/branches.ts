@@ -1,13 +1,11 @@
-import {GitHubBackend} from "@staticcms/core";
+import { GitHubBackend } from '@staticcms/core';
+import { LOAD_BRANCHES_FAILURE, LOAD_BRANCHES_REQUEST, LOAD_BRANCHES_SUCCESS } from '../constants';
+import { currentBackend } from '@staticcms/core/backend';
 
-import {LOAD_BRANCHES_FAILURE, LOAD_BRANCHES_REQUEST, LOAD_BRANCHES_SUCCESS} from '../constants';
-import {currentBackend} from "@staticcms/core/backend";
-
-import type {ThunkDispatch} from "redux-thunk";
-import type {RootState} from "@staticcms/core/store";
-import type {AnyAction} from "redux";
-import type {Branch} from "@staticcms/core/reducers/branches";
-
+import type { ThunkDispatch } from 'redux-thunk';
+import type { RootState } from '@staticcms/core/store';
+import type { AnyAction } from 'redux';
+import type { Branch } from '@staticcms/core/reducers/branches';
 
 export function branchesLoaded(branches: Branch[]) {
   return {
@@ -30,7 +28,6 @@ export function branchesFailed(err: Error) {
   } as const;
 }
 
-
 export function loadBranches() {
   return async (dispatch: ThunkDispatch<RootState, {}, AnyAction>, getState: () => RootState) => {
     const state = getState();
@@ -49,13 +46,13 @@ export function loadBranches() {
 
     dispatch(branchesLoading());
     try {
-      const branches = await gitHubBackend.getBranches()
+      const branches = await gitHubBackend.getBranches();
       dispatch(branchesLoaded(branches));
-    } catch(error) {
+    } catch (error) {
       console.error(error);
       dispatch(branchesFailed(error as Error));
     }
-  }
+  };
 }
 
 export type BranchesAction = ReturnType<
