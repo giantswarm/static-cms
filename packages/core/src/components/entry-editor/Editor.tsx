@@ -338,7 +338,7 @@ const Editor: FC<TranslatedProps<EditorProps>> = ({
         <h3>{entry.error}</h3>
       </div>
     );
-  } else if (entryDraft == null || entryDraft?.entry === undefined || (entry && entry.isFetching)) {
+  } else if (entryDraft == null || entryDraft.entry === undefined || (entry && entry.isFetching)) {
     return <Loader>{t('editor.editor.loadingEntry')}</Loader>;
   }
 
