@@ -104,6 +104,7 @@ interface EditorInterfaceProps {
   submitted: boolean;
   slug: string | undefined;
   onDiscardDraft: () => void;
+  showLeftNav: boolean;
 }
 
 const EditorInterface = ({
@@ -126,6 +127,7 @@ const EditorInterface = ({
   submitted,
   slug,
   onDiscardDraft,
+  showLeftNav,
 }: TranslatedProps<EditorInterfaceProps>) => {
   const config = useAppSelector(selectConfig);
 
@@ -385,6 +387,7 @@ const EditorInterface = ({
             fields={fields}
             editorSize={editorSize}
             showMobilePreview={showMobilePreview}
+            showLeftNav={showLeftNav}
           />
         </Panel>
       </PanelGroup>
@@ -443,6 +446,7 @@ const EditorInterface = ({
     <MainView
       breadcrumbs={breadcrumbs}
       noMargin
+      showLeftNav={true}
       noScroll={finalPreviewActive || i18nActive}
       navbarActions={
         <EditorToolbar

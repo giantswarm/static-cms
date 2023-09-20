@@ -6,8 +6,8 @@ import { useLocation } from 'react-router-dom';
 
 import useEntries from '@staticcms/core/lib/hooks/useEntries';
 import classNames from '@staticcms/core/lib/util/classNames.util';
-import { getTreeData } from '@staticcms/core/lib/util/nested.util';
 import { generateClassNames } from '@staticcms/core/lib/util/theming.util';
+import {getTreeData, getTreeNodeIndexFile, isNodeEditable, isNodeIndexFile} from '@staticcms/core/lib/util/nested.util';
 import NavLink from '../navbar/NavLink';
 
 import type { Collection, Entry } from '@staticcms/core/interface';
@@ -33,7 +33,7 @@ export const classes = generateClassNames('NestedCollection', [
 function getNodeTitle(node: TreeNodeData) {
   const title = node.isRoot
     ? node.title
-    : node.children.find(c => !c.isDir && c.title)?.title || node.title;
+    : node.children.find(c => !c.isDir && c.title)?.title || node.title || ('slug' in node && node.slug.split('/').slice(-1)[0]);
   return title;
 }
 
@@ -83,14 +83,27 @@ const TreeNode = ({
   return (
     <>
       {sortedData.map(node => {
-        const leaf = node.children.length <= 1 && !node.children[0]?.isDir && depth > 0;
-        if (leaf) {
+
+        if (isNodeIndexFile(collection, node)) {
           return null;
         }
-        let to = `/collections/${collectionName}`;
-        if (depth > 0) {
-          to = `${to}/filter${node.path}`;
+
+        const index = getTreeNodeIndexFile(collection, node);
+        if (node === index) {
+          return null;
         }
+
+        let to;
+        if (index) {
+          to = `/collections/${collectionName}/entries/${index.slug}`;
+        } else if (isNodeEditable(collection, node) && 'slug' in node) {
+          to = `/collections/${collectionName}/entries/${node.slug}`;
+        } else if (depth > 0) {
+          to = `/collections/${collectionName}/filter${node.path}`;
+        } else {
+          to = `/collections/${collectionName}`;
+        }
+
         const title = getNodeTitle(node);
 
         const hasChildren = depth === 0 || node.children.some(c => c.children.some(c => c.isDir));

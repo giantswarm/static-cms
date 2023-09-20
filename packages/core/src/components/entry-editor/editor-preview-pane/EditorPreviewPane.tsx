@@ -117,6 +117,7 @@ export interface EditorPreviewPaneProps {
   livePreviewUrlTemplate: string | undefined;
   editorSize: EditorSize;
   showMobilePreview: boolean;
+  showLeftNav?: boolean;
 }
 
 const EditorPreviewPane = (props: TranslatedProps<EditorPreviewPaneProps>) => {
@@ -128,6 +129,7 @@ const EditorPreviewPane = (props: TranslatedProps<EditorPreviewPaneProps>) => {
     previewInFrame,
     livePreviewUrlTemplate,
     showMobilePreview,
+    showLeftNav,
     t,
   } = props;
 
@@ -206,6 +208,7 @@ const EditorPreviewPane = (props: TranslatedProps<EditorPreviewPaneProps>) => {
       return null;
     }
 
+    !!showLeftNav;
     return (
       <div
         className={classNames(
