@@ -182,7 +182,13 @@ const PreviewPane = (props: TranslatedProps<EditorPreviewPaneProps>) => {
             top-16
             right-0
           `,
-          showLeftNav ? (editorCompact ? 'w-preview-compact-sidebar' : 'w-preview-half-sidebar') : (editorCompact ? 'w-preview' : 'w-6/12'),
+          showLeftNav
+            ? editorCompact
+              ? 'w-preview-compact-sidebar'
+              : 'w-preview-half-sidebar'
+            : editorCompact
+            ? 'w-preview'
+            : 'w-6/12',
         )}
       >
         {!entry || !entry.data ? null : (

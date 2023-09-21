@@ -20,7 +20,11 @@ import {
 } from '../constants';
 import { sanitizeSlug } from '../lib/urlHelper';
 import { basename, getBlobSHA } from '../lib/util';
-import { selectMediaFilePath, selectMediaFilePublicPath } from '../lib/util/media.util';
+import {
+  findCollectionEntryExtensions,
+  selectMediaFilePath,
+  selectMediaFilePublicPath,
+} from '../lib/util/media.util';
 import { selectEditingDraft } from '../reducers/selectors/entryDraft';
 import { selectMediaDisplayURL, selectMediaFiles } from '../reducers/selectors/mediaLibrary';
 import { addSnackbar } from '../store/slices/snackbars';
@@ -155,12 +159,22 @@ export function loadMedia(
       return;
     }
 
+    const entryExtensions = findCollectionEntryExtensions(
+      config.collections,
+      currentFolder || '',
+    ).map(ext => `.${ext}`);
+    const isMediaFile = (file: MediaFile) =>
+      !entryExtensions.length ||
+      ('isDirectory' in file && file.isDirectory) ||
+      !entryExtensions.some(ext => file.name.endsWith(ext));
+
     const backend = currentBackend(config);
     dispatch(mediaLoading(page));
 
     function loadFunction() {
       return backend
         .getMedia(currentFolder, config?.media_library?.folder_support ?? false)
+        .then(files => files.filter(file => isMediaFile(file)))
         .then(files => dispatch(mediaLoaded(files)))
         .catch((error: { status?: number }) => {
           console.error(error);

@@ -5,7 +5,7 @@ import { useAppDispatch } from '@staticcms/core/store/hooks';
 import { selectEntryCollectionTitle, selectFolderEntryExtension } from '../util/collection.util';
 import { addFileTemplateFields } from '../widgets/stringTemplate';
 import useEntries from './useEntries';
-import {getTreeNodeIndexFile} from "@staticcms/core/lib/util/nested.util";
+import { getTreeNodeIndexFile } from '@staticcms/core/lib/util/nested.util';
 
 import type { Breadcrumb, Collection, Entry } from '@staticcms/core/interface';
 import type { t } from 'react-polyglot';
