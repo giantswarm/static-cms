@@ -7,7 +7,6 @@ import { useLocation } from 'react-router-dom';
 import useEntries from '@staticcms/core/lib/hooks/useEntries';
 import classNames from '@staticcms/core/lib/util/classNames.util';
 import { generateClassNames } from '@staticcms/core/lib/util/theming.util';
-import {getTreeData, getTreeNodeIndexFile, isNodeEditable, isNodeIndexFile} from '@staticcms/core/lib/util/nested.util';
 import {
   getTreeData,
   getTreeNodeIndexFile,
