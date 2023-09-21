@@ -8,6 +8,12 @@ import useEntries from '@staticcms/core/lib/hooks/useEntries';
 import classNames from '@staticcms/core/lib/util/classNames.util';
 import { generateClassNames } from '@staticcms/core/lib/util/theming.util';
 import {getTreeData, getTreeNodeIndexFile, isNodeEditable, isNodeIndexFile} from '@staticcms/core/lib/util/nested.util';
+import {
+  getTreeData,
+  getTreeNodeIndexFile,
+  isNodeEditable,
+  isNodeIndexFile,
+} from '@staticcms/core/lib/util/nested.util';
 import NavLink from '../navbar/NavLink';
 
 import type { Collection, Entry } from '@staticcms/core/interface';
@@ -33,7 +39,9 @@ export const classes = generateClassNames('NestedCollection', [
 function getNodeTitle(node: TreeNodeData) {
   const title = node.isRoot
     ? node.title
-    : node.children.find(c => !c.isDir && c.title)?.title || node.title || ('slug' in node && node.slug.split('/').slice(-1)[0]);
+    : node.children.find(c => !c.isDir && c.title)?.title ||
+      node.title ||
+      ('slug' in node && node.slug.split('/').slice(-1)[0]);
   return title;
 }
 
@@ -83,7 +91,6 @@ const TreeNode = ({
   return (
     <>
       {sortedData.map(node => {
-
         if (isNodeIndexFile(collection, node)) {
           return null;
         }

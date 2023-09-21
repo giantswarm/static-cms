@@ -4,6 +4,7 @@ import { dirname } from 'path';
 import { basename, isAbsolutePath } from '.';
 import { folderFormatter } from '../formatters';
 import { joinUrlPath } from '../urlHelper';
+import { selectFolderEntryExtension } from '@staticcms/core/lib/util/collection.util';
 
 import type {
   BaseField,
@@ -350,4 +351,20 @@ export function selectMediaFilePath(
   return mediaPath.startsWith(mediaFolder)
     ? mediaPath
     : joinUrlPath(mediaFolder, basename(mediaPath));
+}
+
+export function findCollectionsByFolder(collections: Collection[], folder: string) {
+  return collections.filter(
+    collection =>
+      !folder ||
+      folder.startsWith(
+        ('folder' in collection && collection.folder) || (collection.path || '').slice(1),
+      ),
+  );
+}
+
+export function findCollectionEntryExtensions(collections: Collection[], folder: string) {
+  return findCollectionsByFolder(collections, folder).map(collection =>
+    selectFolderEntryExtension(collection),
+  );
 }
