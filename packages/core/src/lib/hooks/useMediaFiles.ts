@@ -61,7 +61,7 @@ export default function useMediaFiles(field?: MediaField, currentFolder?: string
             ? trim(currentFolder, '/').replace(trim(media_folder, '/'), public_folder)
             : currentFolder,
         )
-      ).filter(file => isMediaFile(file));
+      ).filter(isMediaFile);
 
       if (alive) {
         setCurrentFolderMediaFiles(files);

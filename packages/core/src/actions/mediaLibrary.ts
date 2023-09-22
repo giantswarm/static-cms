@@ -174,7 +174,7 @@ export function loadMedia(
     function loadFunction() {
       return backend
         .getMedia(currentFolder, config?.media_library?.folder_support ?? false)
-        .then(files => files.filter(file => isMediaFile(file)))
+        .then(files => files.filter(isMediaFile))
         .then(files => dispatch(mediaLoaded(files)))
         .catch((error: { status?: number }) => {
           console.error(error);
