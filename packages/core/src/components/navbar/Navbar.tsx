@@ -10,6 +10,7 @@ import { useAppDispatch, useAppSelector } from '@staticcms/core/store/hooks';
 import Button from '../common/button/Button';
 import { StaticCmsIcon } from '../images/_index';
 import Breadcrumbs from './Breadcrumbs';
+import BranchSelect from './BranchSelect';
 import QuickCreate from './QuickCreate';
 import SettingsDropdown from './SettingsDropdown';
 
@@ -89,6 +90,7 @@ const Navbar = ({
                 <OpenInNewIcon className={classes['site-url-icon']} />
               </Button>
             ) : null}
+            <BranchSelect />
             {showQuickCreate ? (
               <QuickCreate key="quick-create" rootClassName={classes['quick-create']} />
             ) : null}

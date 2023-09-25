@@ -254,6 +254,9 @@ const en: LocalePhrasesRoot = {
     },
   },
   ui: {
+    branchSelect: {
+      branch: 'Branch',
+    },
     common: {
       yes: 'Yes',
       no: 'No',

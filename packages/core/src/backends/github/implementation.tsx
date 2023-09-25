@@ -137,6 +137,13 @@ export default class GitHub implements BackendClass {
     return this.authenticate(user);
   }
 
+  setBranch(branch: string) {
+    this.branch = branch;
+    if (this.api) {
+      this.api.branch = branch;
+    }
+  }
+
   async currentUser({ token }: { token: string }) {
     if (!this._currentUserPromise) {
       this._currentUserPromise = fetch(`${this.apiRoot}/user`, {
@@ -434,5 +441,9 @@ export default class GitHub implements BackendClass {
       entries,
       cursor: result.cursor,
     };
+  }
+
+  getBranches() {
+    return this.api!.getBranches();
   }
 }

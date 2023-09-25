@@ -32,9 +32,11 @@ import EditorRoute from './entry-editor/EditorRoute';
 import MediaPage from './media-library/MediaPage';
 import Page from './page/Page';
 import Snackbars from './snackbar/Snackbars';
+import {loadBranches} from "../actions/branches";
 import ThemeManager from './theme/ThemeManager';
 import useTheme from './theme/hooks/useTheme';
 
+import type {AnyAction} from "redux";
 import type { Credentials, TranslatedProps } from '@staticcms/core/interface';
 import type { RootState } from '@staticcms/core/store';
 import type { ComponentType } from 'react';
@@ -72,6 +74,7 @@ const App = ({
   user,
   config,
   collections,
+  branches,
   loginUser,
   isFetching,
   t,
@@ -225,6 +228,12 @@ const App = ({
   }, []);
 
   useEffect(() => {
+    if (user && !branches.isFetching && !branches.branches) {
+      dispatch(loadBranches() as unknown as AnyAction);
+    }
+  }, [dispatch, user, isFetching, branches]);
+
+  useEffect(() => {
     const defaultTheme = config.config?.theme?.default_theme;
     if (isEmpty(defaultTheme)) {
       return;
@@ -270,7 +279,7 @@ const App = ({
 };
 
 function mapStateToProps(state: RootState) {
-  const { auth, config, collections, globalUI, scroll } = state;
+  const { auth, config, collections, branches, globalUI, scroll } = state;
   const user = auth.user;
   const isFetching = globalUI.isFetching;
   const scrollSyncEnabled = scroll.isScrolling;
@@ -278,6 +287,7 @@ function mapStateToProps(state: RootState) {
     auth,
     config,
     collections,
+    branches,
     user,
     isFetching,
     scrollSyncEnabled,
