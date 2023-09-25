@@ -4,9 +4,11 @@ import { dirname } from 'path';
 import { basename, isAbsolutePath } from '.';
 import { folderFormatter } from '../formatters';
 import { joinUrlPath } from '../urlHelper';
-import { selectFolderEntryExtension } from '@staticcms/core/lib/util/collection.util';
+import { selectFolderEntryExtension } from './collection.util';
 
 import type {
+  ImplementationMediaFile,
+  MediaFile,
   BaseField,
   Collection,
   CollectionFile,
@@ -18,7 +20,7 @@ import type {
   MarkdownField,
   MediaField,
   ObjectField,
-} from '@staticcms/core/interface';
+} from '../../interface';
 
 export const DRAFT_MEDIA_FILES = 'DRAFT_MEDIA_FILES';
 
@@ -366,5 +368,20 @@ export function findCollectionsByFolder(collections: Collection[], folder: strin
 export function findCollectionEntryExtensions(collections: Collection[], folder: string) {
   return findCollectionsByFolder(collections, folder).map(collection =>
     selectFolderEntryExtension(collection),
+  );
+}
+
+export function filterMediaFilesByExtension(
+  collections: Collection[],
+  folder: string,
+  mediaFiles: ImplementationMediaFile[],
+) {
+  const entryExtensions = findCollectionEntryExtensions(collections, folder).map(ext => `.${ext}`);
+
+  return mediaFiles.filter(
+    (file: MediaFile) =>
+      !entryExtensions.length ||
+      ('isDirectory' in file && file.isDirectory) ||
+      !entryExtensions.some(ext => file.name.endsWith(ext)),
   );
 }

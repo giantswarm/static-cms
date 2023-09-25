@@ -21,7 +21,7 @@ import {
 import { sanitizeSlug } from '../lib/urlHelper';
 import { basename, getBlobSHA } from '../lib/util';
 import {
-  findCollectionEntryExtensions,
+  filterMediaFilesByExtension,
   selectMediaFilePath,
   selectMediaFilePublicPath,
 } from '../lib/util/media.util';
@@ -159,22 +159,14 @@ export function loadMedia(
       return;
     }
 
-    const entryExtensions = findCollectionEntryExtensions(
-      config.collections,
-      currentFolder || '',
-    ).map(ext => `.${ext}`);
-    const isMediaFile = (file: MediaFile) =>
-      !entryExtensions.length ||
-      ('isDirectory' in file && file.isDirectory) ||
-      !entryExtensions.some(ext => file.name.endsWith(ext));
-
+    const collections = config.collections;
     const backend = currentBackend(config);
     dispatch(mediaLoading(page));
 
     function loadFunction() {
       return backend
         .getMedia(currentFolder, config?.media_library?.folder_support ?? false)
-        .then(files => files.filter(isMediaFile))
+        .then(files => filterMediaFilesByExtension(collections, currentFolder || '', files))
         .then(files => dispatch(mediaLoaded(files)))
         .catch((error: { status?: number }) => {
           console.error(error);
