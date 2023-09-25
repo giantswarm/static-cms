@@ -4,8 +4,11 @@ import { dirname } from 'path';
 import { basename, isAbsolutePath } from '.';
 import { folderFormatter } from '../formatters';
 import { joinUrlPath } from '../urlHelper';
+import { selectFolderEntryExtension } from './collection.util';
 
 import type {
+  ImplementationMediaFile,
+  MediaFile,
   BaseField,
   Collection,
   CollectionFile,
@@ -17,7 +20,7 @@ import type {
   MarkdownField,
   MediaField,
   ObjectField,
-} from '@staticcms/core/interface';
+} from '../../interface';
 
 export const DRAFT_MEDIA_FILES = 'DRAFT_MEDIA_FILES';
 
@@ -350,4 +353,35 @@ export function selectMediaFilePath(
   return mediaPath.startsWith(mediaFolder)
     ? mediaPath
     : joinUrlPath(mediaFolder, basename(mediaPath));
+}
+
+export function findCollectionsByFolder(collections: Collection[], folder: string) {
+  return collections.filter(
+    collection =>
+      !folder ||
+      folder.startsWith(
+        ('folder' in collection && collection.folder) || (collection.path || '').slice(1),
+      ),
+  );
+}
+
+export function findCollectionEntryExtensions(collections: Collection[], folder: string) {
+  return findCollectionsByFolder(collections, folder).map(collection =>
+    selectFolderEntryExtension(collection),
+  );
+}
+
+export function filterMediaFilesByExtension(
+  collections: Collection[],
+  folder: string,
+  mediaFiles: ImplementationMediaFile[],
+) {
+  const entryExtensions = findCollectionEntryExtensions(collections, folder).map(ext => `.${ext}`);
+
+  return mediaFiles.filter(
+    (file: MediaFile) =>
+      !entryExtensions.length ||
+      ('isDirectory' in file && file.isDirectory) ||
+      !entryExtensions.some(ext => file.name.endsWith(ext)),
+  );
 }

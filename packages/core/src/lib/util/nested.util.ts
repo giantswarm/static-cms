@@ -93,20 +93,31 @@ export function getNestedSlug(
   return '';
 }
 
-export function isNodeEditable(collection: Collection, node: SingleTreeNodeData | TreeNodeData): boolean {
+export function isNodeEditable(
+  collection: Collection,
+  node: SingleTreeNodeData | TreeNodeData,
+): boolean {
   return !node.isDir && (!collection.extension || node.path.endsWith(collection.extension));
 }
 
-export function isNodeIndexFile(collection: Collection, node: SingleTreeNodeData | TreeNodeData | Entry): boolean {
+export function isNodeIndexFile(
+  collection: Collection,
+  node: SingleTreeNodeData | TreeNodeData | Entry,
+): boolean {
   const index_file = 'nested' in collection ? collection.nested?.path?.index_file : undefined;
   return !!(
-    index_file && node && 'slug' in node
-    && (!('children' in node) || !node.isDir)
-    && node.path.endsWith(`/${index_file}.${collection.extension}`)
+    index_file &&
+    node &&
+    'slug' in node &&
+    (!('children' in node) || !node.isDir) &&
+    node.path.endsWith(`/${index_file}.${collection.extension}`)
   );
 }
 
-export function getTreeNodeIndexFile(collection: Collection, node: SingleTreeNodeData | TreeNodeData | Entry): (TreeNodeData & Entry) | undefined {
+export function getTreeNodeIndexFile(
+  collection: Collection,
+  node: SingleTreeNodeData | TreeNodeData | Entry,
+): (TreeNodeData & Entry) | undefined {
   if (node && 'children' in node) {
     return node.children.find(c => isNodeIndexFile(collection, c)) as TreeNodeData & Entry;
   }
