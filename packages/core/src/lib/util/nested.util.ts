@@ -114,6 +114,20 @@ export function isNodeIndexFile<EF extends BaseField = UnknownField>(
   );
 }
 
+export function rewriteNodeBranchBundleRelativeLinkSrc<EF extends BaseField = UnknownField>(
+  collection: Collection<EF>,
+  node: SingleTreeNodeData | TreeNodeData | Entry,
+  src: string,
+): string {
+  if (collection.media_library?.branch_bundle
+    && src.startsWith('../')  // we ignore impossible relative links inside the created directory
+    && !isNodeIndexFile(collection, node)) {
+    return src.slice(3);
+  }
+
+  return src;
+}
+
 export function getTreeNodeIndexFile<EF extends BaseField = UnknownField>(
   collection: Collection<EF>,
   node: SingleTreeNodeData | TreeNodeData | Entry,
