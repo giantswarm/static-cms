@@ -583,6 +583,7 @@ export interface MediaLibraryInitOptions {
 export interface MediaLibraryConfig {
   max_file_size?: number;
   folder_support?: boolean;
+  branch_bundle?: boolean;
 }
 
 export type BackendType =

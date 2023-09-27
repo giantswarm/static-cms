@@ -338,6 +338,9 @@ export function selectMediaFilePath(
     }
 
     if (mediaPathDir.includes(publicFolder) && mediaPathDir != mediaFolder) {
+      const mergableMediaPathDir = mediaFolder === '' || mediaFolder.endsWith('/') || mediaPathDir === '' || mediaPathDir.includes('/')
+        ? mediaPathDir
+        : '/' + mediaPathDir;
       mediaFolder = selectMediaFolder(
         config,
         collection,
@@ -345,7 +348,7 @@ export function selectMediaFilePath(
         field,
         publicFolder === '' && mediaPathDir.startsWith(mediaFolder)
           ? mediaPathDir
-          : mediaPathDir.replace(publicFolder, mediaFolder),
+          : mergableMediaPathDir.replace(publicFolder, mediaFolder),
       );
     }
   }

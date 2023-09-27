@@ -7,6 +7,7 @@ import { isEmpty } from '@staticcms/core/lib/util/string.util';
 import { generateClassNames } from '@staticcms/core/lib/util/theming.util';
 import { selectEditingDraft } from '@staticcms/core/reducers/selectors/entryDraft';
 import { useAppSelector } from '@staticcms/core/store/hooks';
+import {isNodeIndexFile} from "@staticcms/core/lib/util/nested.util";
 
 import type {
   BaseField,
@@ -66,10 +67,21 @@ const Image = <EF extends BaseField = UnknownField>({
 export const withMdxImage = <EF extends BaseField = UnknownField>({
   collection,
   field,
-}: Pick<ImageProps<EF>, 'collection' | 'field'>) => {
-  const MdxImage = (props: Omit<ImageProps<EF>, 'collection' | 'field'>) => (
-    <Image {...props} collection={collection} field={field} />
-  );
+  entry,
+}: Pick<ImageProps<EF>, 'collection' | 'field' | 'entry'>) => {
+  const MdxImage = (props: Omit<ImageProps<EF>, 'collection' | 'field'>) => {
+
+    if (collection?.media_library?.branch_bundle
+      && collection
+      && entry
+      && props.src
+      && props.src.startsWith('../')
+      && !isNodeIndexFile(collection, entry)) {
+      props = {...props, src: props.src.slice(3)};
+    }
+
+    return <Image {...props} collection={collection} field={field} />
+  };
 
   return MdxImage;
 };
