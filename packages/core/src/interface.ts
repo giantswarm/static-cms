@@ -236,6 +236,8 @@ interface Nested {
     label?: string;
     index_file: string;
   };
+
+  branch_bundle?: boolean;
 }
 
 export interface I18nSettings {
@@ -583,7 +585,6 @@ export interface MediaLibraryInitOptions {
 export interface MediaLibraryConfig {
   max_file_size?: number;
   folder_support?: boolean;
-  branch_bundle?: boolean;
 }
 
 export type BackendType =

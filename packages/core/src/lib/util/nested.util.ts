@@ -119,7 +119,7 @@ export function rewriteNodeBranchBundleRelativeLinkSrc<EF extends BaseField = Un
   node: SingleTreeNodeData | TreeNodeData | Entry,
   src: string,
 ): string {
-  if (collection.media_library?.branch_bundle
+  if ('nested' in collection && collection.nested?.branch_bundle
     && src.startsWith('../')  // we ignore impossible relative links inside the created directory
     && !isNodeIndexFile(collection, node)) {
     return src.slice(3);
