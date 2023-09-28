@@ -95,8 +95,8 @@ export function getAsset<T extends MediaField, EF extends BaseField = UnknownFie
       currentFolder,
     );
 
-    const { asset, isLoading } = state.medias[resolvedPath] || {};
-    if (isLoading) {
+    const { asset, isLoading, error } = state.medias[resolvedPath] || {};
+    if (isLoading || error) {
       return promiseCache[resolvedPath];
     }
 
@@ -105,10 +105,10 @@ export function getAsset<T extends MediaField, EF extends BaseField = UnknownFie
       return Promise.resolve(asset);
     }
 
-    const p = new Promise<AssetProxy>(resolve => {
+    const p = new Promise<AssetProxy>((resolve, reject) => {
       loadAsset(resolvedPath, dispatch, getState).then(asset => {
         resolve(asset);
-      });
+      }).catch(error => reject(error));
     });
 
     promiseCache[resolvedPath] = p;

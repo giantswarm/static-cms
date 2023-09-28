@@ -14,6 +14,7 @@ import { useFocused } from 'slate-react';
 import useDebounce from '@staticcms/core/lib/hooks/useDebounce';
 import { generateClassNames } from '@staticcms/core/lib/util/theming.util';
 import MediaPopover from '../../common/MediaPopover';
+import {rewriteNodeBranchBundleRelativeLinkSrc} from "@staticcms/core/lib/util/nested.util";
 
 import type { Collection, MarkdownField, MediaPath } from '@staticcms/core/interface';
 import type { MdLinkElement, MdValue } from '@staticcms/markdown';
@@ -26,10 +27,11 @@ const classes = generateClassNames('WidgetMarkdown_Link', ['root']);
 
 export interface WithLinkElementProps {
   collection: Collection<MarkdownField>;
+  entry: Entry;
   field: MarkdownField;
 }
 
-const withLinkElement = ({ collection, field }: WithLinkElementProps) => {
+const withLinkElement = ({ collection, entry, field }: WithLinkElementProps) => {
   const LinkElement: FC<PlateRenderElementProps<MdValue, MdLinkElement>> = ({
     attributes: { ref: _ref, ...attributes },
     children,
@@ -198,12 +200,17 @@ const withLinkElement = ({ collection, field }: WithLinkElementProps) => {
       anchorEl,
     ]);
 
+    let loadUrl = url;
+    if (collection && entry && url) {
+      loadUrl = rewriteNodeBranchBundleRelativeLinkSrc(collection, entry, url);
+    }
+
     return (
       <span onBlur={handleBlur}>
         <a
           ref={urlRef}
           {...attributes}
-          href={url}
+          href={loadUrl}
           {...nodeProps}
           onClick={handleClick}
           className={classes.root}
@@ -214,7 +221,7 @@ const withLinkElement = ({ collection, field }: WithLinkElementProps) => {
           anchorEl={anchorEl}
           collection={collection}
           field={field}
-          url={url}
+          url={loadUrl}
           text={alt}
           onMediaChange={handleMediaChange}
           onRemove={handleRemove}
