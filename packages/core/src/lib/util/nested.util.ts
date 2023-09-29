@@ -6,7 +6,7 @@ import { stringTemplate } from '../widgets';
 import { selectEntryCollectionTitle, selectFolderEntryExtension } from './collection.util';
 import { isEmpty, isNotEmpty } from './string.util';
 
-import type { BaseField, Collection, Entry, Slug } from '@staticcms/core/interface';
+import type { BaseField, Collection, Entry, Slug, UnknownField } from '@staticcms/core/interface';
 
 const { addFileTemplateFields } = stringTemplate;
 
@@ -93,15 +93,15 @@ export function getNestedSlug(
   return '';
 }
 
-export function isNodeEditable(
-  collection: Collection,
+export function isNodeEditable<EF extends BaseField = UnknownField>(
+  collection: Collection<EF>,
   node: SingleTreeNodeData | TreeNodeData,
 ): boolean {
   return !node.isDir && (!collection.extension || node.path.endsWith(collection.extension));
 }
 
-export function isNodeIndexFile(
-  collection: Collection,
+export function isNodeIndexFile<EF extends BaseField = UnknownField>(
+  collection: Collection<EF>,
   node: SingleTreeNodeData | TreeNodeData | Entry,
 ): boolean {
   const index_file = 'nested' in collection ? collection.nested?.path?.index_file : undefined;
@@ -114,8 +114,22 @@ export function isNodeIndexFile(
   );
 }
 
-export function getTreeNodeIndexFile(
-  collection: Collection,
+export function rewriteNodeBranchBundleRelativeLinkSrc<EF extends BaseField = UnknownField>(
+  collection: Collection<EF>,
+  node: SingleTreeNodeData | TreeNodeData | Entry,
+  src: string,
+): string {
+  if ('nested' in collection && collection.nested?.branch_bundle
+    && src.startsWith('../')  // we ignore impossible relative links inside the created directory
+    && !isNodeIndexFile(collection, node)) {
+    return src.slice(3);
+  }
+
+  return src;
+}
+
+export function getTreeNodeIndexFile<EF extends BaseField = UnknownField>(
+  collection: Collection<EF>,
   node: SingleTreeNodeData | TreeNodeData | Entry,
 ): (TreeNodeData & Entry) | undefined {
   if (node && 'children' in node) {

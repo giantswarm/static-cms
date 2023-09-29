@@ -43,14 +43,14 @@ const MdxComponent: FC<MdxComponentProps> = ({ state }) => {
 };
 
 const MarkdownPreview: FC<WidgetPreviewProps<string, MarkdownField>> = previewProps => {
-  const { value, collection, field } = previewProps;
+  const { value, collection, field, entry } = previewProps;
 
   const id = useUUID();
 
   const components = useMemo(
     () => ({
       Shortcode: withShortcodeMdxComponent({ previewProps }),
-      img: withMdxImage({ collection, field }),
+      img: withMdxImage({ collection, field, entry }),
     }),
     [collection, field, previewProps],
   );

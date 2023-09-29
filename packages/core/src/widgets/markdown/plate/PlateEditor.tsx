@@ -157,6 +157,7 @@ const PlateEditor: FC<PlateEditorProps> = ({
       [ELEMENT_CODE_BLOCK]: CodeBlockElement,
       [ELEMENT_LINK]: withLinkElement({
         collection,
+        entry,
         field,
       }),
       [ELEMENT_IMAGE]: withImageElement({

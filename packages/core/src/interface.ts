@@ -236,6 +236,8 @@ interface Nested {
     label?: string;
     index_file: string;
   };
+
+  branch_bundle?: boolean;
 }
 
 export interface I18nSettings {

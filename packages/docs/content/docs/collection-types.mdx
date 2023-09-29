@@ -599,6 +599,8 @@ collections:
       # adding a path object allows editing the path of entries
       # moving an existing entry will move the entire sub tree of the entry to the new location
       path: { widget: string, index_file: 'index' }
+      # support for Hugo's branch bundles, with index files named _index.md (disabled by default)
+      branch_bundle: false
     fields:
       - label: Title
         name: title
@@ -624,6 +626,7 @@ collections:
           "label": "Path",
           "index_file": "index"
         }
+        "branch_bundle": false
       },
       "fields": [
         {
@@ -658,6 +661,31 @@ content
         ├── hello-world
         │   └── index.md
         └── index.md
+```
+
+#### Hugo Branch Bundles
+
+The [Hugo](https://gohugo.io/) static site generator supports a page organization model called [branch bundles](https://gohugo.io/content-management/page-bundles/#branch-bundles).
+
+Under branch bundles, index files are called `_index.md` and sibling markdown files are *rendered* into their own nested directory.
+
+To support branch bundle organization with a specific nested collection, set the `branch_bundle` option to `true`.
+
+A branch bundles enabled folder structure may looks like this:
+
+```bash
+content
+└── pages
+    ├── world
+    │   ├── res
+    │   │   └── hello-world.jpg
+    │   ├── hello-world.md
+    │   └── _index.md
+    ├── team
+    │   ├── john.jpg
+    │   ├── john.md
+    │   └── _index.md
+    └── _index.md
 ```
 
 ## File Collections

@@ -7,6 +7,7 @@ import { isEmpty } from '@staticcms/core/lib/util/string.util';
 import { generateClassNames } from '@staticcms/core/lib/util/theming.util';
 import { selectEditingDraft } from '@staticcms/core/reducers/selectors/entryDraft';
 import { useAppSelector } from '@staticcms/core/store/hooks';
+import {rewriteNodeBranchBundleRelativeLinkSrc} from "@staticcms/core/lib/util/nested.util";
 
 import type {
   BaseField,
@@ -66,10 +67,16 @@ const Image = <EF extends BaseField = UnknownField>({
 export const withMdxImage = <EF extends BaseField = UnknownField>({
   collection,
   field,
-}: Pick<ImageProps<EF>, 'collection' | 'field'>) => {
-  const MdxImage = (props: Omit<ImageProps<EF>, 'collection' | 'field'>) => (
-    <Image {...props} collection={collection} field={field} />
-  );
+  entry,
+}: Pick<ImageProps<EF>, 'collection' | 'field' | 'entry'>) => {
+  const MdxImage = (props: Omit<ImageProps<EF>, 'collection' | 'field' | 'entry'>) => {
+
+    if (collection && entry && props.src) {
+      props = {...props, src: rewriteNodeBranchBundleRelativeLinkSrc(collection, entry, props.src)};
+    }
+
+    return <Image {...props} collection={collection} field={field} entry={entry} />
+  };
 
   return MdxImage;
 };

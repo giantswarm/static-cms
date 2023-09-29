@@ -19,6 +19,7 @@ import type { MdImageElement, MdValue } from '@staticcms/markdown';
 import type { PlateRenderElementProps } from '@udecode/plate';
 import type { TMediaElement } from '@udecode/plate-media';
 import type { FC } from 'react';
+import {rewriteNodeBranchBundleRelativeLinkSrc} from "@staticcms/core/lib/util/nested.util";
 
 export interface WithImageElementProps {
   collection: Collection<MarkdownField>;
@@ -93,7 +94,11 @@ const withImageElement = ({ collection, entry, field }: WithImageElementProps) =
       setAnchorEl(null);
     }, []);
 
-    const assetSource = useMediaAsset(url, collection, field, entry);
+    let loadUrl = url;
+    if (collection && entry && url) {
+      loadUrl = rewriteNodeBranchBundleRelativeLinkSrc(collection, entry, url);
+    }
+    const assetSource = useMediaAsset(loadUrl, collection, field, entry);
 
     const handleMediaChange = useCallback(
       (newValue: MediaPath<string>) => {
@@ -177,7 +182,7 @@ const withImageElement = ({ collection, entry, field }: WithImageElementProps) =
           anchorEl={anchorEl}
           collection={collection}
           field={field}
-          url={url}
+          url={loadUrl}
           text={alt}
           onMediaChange={handleMediaChange}
           onRemove={handleRemove}
