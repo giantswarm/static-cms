@@ -16,7 +16,7 @@ import { generateClassNames } from '@staticcms/core/lib/util/theming.util';
 import MediaPopover from '../../common/MediaPopover';
 import {rewriteNodeBranchBundleRelativeLinkSrc} from "@staticcms/core/lib/util/nested.util";
 
-import type { Collection, MarkdownField, MediaPath } from '@staticcms/core/interface';
+import type {Collection, Entry, MarkdownField, MediaPath} from '@staticcms/core/interface';
 import type { MdLinkElement, MdValue } from '@staticcms/markdown';
 import type { PlateRenderElementProps, TText } from '@udecode/plate';
 import type { FC, MouseEvent } from 'react';
