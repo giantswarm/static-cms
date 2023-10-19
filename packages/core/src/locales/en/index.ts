@@ -256,6 +256,7 @@ const en: LocalePhrasesRoot = {
   ui: {
     branchSelect: {
       branch: 'Branch',
+      openPull: 'Review Branch',
     },
     common: {
       yes: 'Yes',

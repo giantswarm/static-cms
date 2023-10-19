@@ -40,6 +40,7 @@ import type {
   ReposListCommitsResponse,
   GitCreatePullResponse,
   ReposGetBranchesResponse,
+  GitGetPullsResponse,
 } from './types';
 
 export const API_NAME = 'GitHub';
@@ -516,6 +517,11 @@ export default class API {
       method: 'POST',
       body: JSON.stringify({ title, body, head, base }),
     });
+    return result;
+  }
+
+  async getPulls() {
+    const result: GitGetPullsResponse = await this.request(`${this.repoURL}/pulls`);
     return result;
   }
 

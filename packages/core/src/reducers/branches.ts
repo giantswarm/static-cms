@@ -9,6 +9,7 @@ import type { SelectField } from '../interface';
 
 export interface Branch {
   name: string;
+  protected: boolean;
 }
 
 export interface BranchesState extends SelectField {
