@@ -516,6 +516,13 @@ export interface AuthenticatorConfig {
   clearHash?: () => void;
 }
 
+export interface PullRequestLike {
+  number: number;
+  title: string;
+  html_url: string;
+  branch: string;
+}
+
 export abstract class BackendClass {
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   constructor(_config: Config, _options: BackendInitializerOptions) {}
@@ -546,6 +553,8 @@ export abstract class BackendClass {
   abstract persistEntry(entry: BackendEntry, opts: PersistOptions): Promise<void>;
   abstract persistMedia(file: AssetProxy, opts: PersistOptions): Promise<ImplementationMediaFile>;
   abstract deleteFiles(paths: string[], commitMessage: string): Promise<unknown>;
+
+  getPulls?(): Promise<PullRequestLike[]>;
 
   abstract allEntriesByFolder(
     folder: string,

@@ -691,10 +691,29 @@ export type GitCreateTreeResponse = {
   url: string;
 };
 
+export type GitRef = {
+  ref: string;
+  sha: string;
+};
+
 export type GitCreatePullResponse = {
   url: string;
   number: number;
   title: string;
   html_url: string;
   diff_url: string;
+  base: GitRef;
+  head: GitRef;
 };
+
+export type GitGetPullResponse = {
+  number: number;
+  title: string;
+  state: string;
+  url: string;
+  html_url: string;
+  base: GitRef;
+  head: GitRef;
+};
+
+export type GitGetPullsResponse = GitGetPullResponse[];

@@ -446,4 +446,14 @@ export default class GitHub implements BackendClass {
   getBranches() {
     return this.api!.getBranches();
   }
+
+  async getPulls() {
+    const pulls = await this.api!.getPulls();
+    return pulls.map(pull => ({
+      number: pull.number,
+      title: pull.title,
+      html_url: pull.html_url,
+      branch: pull.head.ref,
+    }));
+  }
 }

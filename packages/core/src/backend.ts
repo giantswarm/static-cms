@@ -1070,6 +1070,13 @@ export class Backend<EF extends BaseField = UnknownField, BC extends BackendClas
   filterEntries(collection: { entries: Entry[] }, filterRule: FilterRule | FilterRule[]) {
     return filterEntries(collection.entries, filterRule, undefined);
   }
+
+  async listPulls() {
+    if (!this.implementation.getPulls) {
+      return [];
+    }
+    return await this.implementation.getPulls();
+  }
 }
 
 export function resolveBackend<EF extends BaseField>(config?: Config<EF>) {
