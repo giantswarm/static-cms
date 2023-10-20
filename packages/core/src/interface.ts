@@ -175,6 +175,7 @@ export interface FieldStorageConverters<
 
 export interface EntryDraft {
   entry: Entry;
+  original: Entry;
   fieldsErrors: FieldsErrors;
 }
 

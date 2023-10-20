@@ -39,6 +39,14 @@ export function selectCustomPath(
 
   const slug = entry.meta?.path ?? getNestedSlug(collection, entry, rootSlug, slugConfig);
 
+  // handle existing leaf pages (in branch bundles)
+  if ('nested' in collection && collection.nested?.branch_bundle) {
+    const customPath = join(collection.folder, `${slug}.${extension}`); // leaf pages
+    if (customPath === entry.path) {
+      return customPath;
+    }
+  }
+
   const customPath = join(collection.folder, slug, `${indexFile}.${extension}`);
   return customPath;
 }
@@ -119,9 +127,12 @@ export function rewriteNodeBranchBundleRelativeLinkSrc<EF extends BaseField = Un
   node: SingleTreeNodeData | TreeNodeData | Entry,
   src: string,
 ): string {
-  if ('nested' in collection && collection.nested?.branch_bundle
-    && src.startsWith('../')  // we ignore impossible relative links inside the created directory
-    && !isNodeIndexFile(collection, node)) {
+  if (
+    'nested' in collection &&
+    collection.nested?.branch_bundle &&
+    src.startsWith('../') && // we ignore impossible relative links inside the created directory
+    !isNodeIndexFile(collection, node)
+  ) {
     return src.slice(3);
   }
 
