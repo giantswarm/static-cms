@@ -394,24 +394,28 @@ export default class API {
     const uploadPromises = files.map(file => this.uploadBlob(file));
     await Promise.all(uploadPromises);
 
-    const createBranchName = (login: string) => {
+    const createBranchNameParts = (login: string) => {
       const pathSlug = (dataFiles[0]?.path || mediaFiles[0]?.path || '')
         .toLowerCase()
         .replace(/[^/\-_.a-z0-9]+/g, '-');
-      return `change-${pathSlug}-by-${login}-at-${Math.round(Date.now() / 1000)}`;
+      return ['change', pathSlug, 'by', login, 'at', ''+Math.round(Date.now() / 1000)];
     };
+
+    const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
     const user = await this.user();
     const branchData = await this.getDefaultBranch();
-    const targetBranch = branchData.protected ? createBranchName(user.login) : this.branch;
+    const targetBranchParts = branchData.protected ? createBranchNameParts(user.login) : [this.branch];
+    const branchName = targetBranchParts.join('-');
+    const prTitle = capitalize(targetBranchParts.join(' '));
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const changeTree = await this.updateTree(branchData.commit.sha, files as any);
     const commitResponse = await this.commit(options.commitMessage, changeTree);
     try {
-      await this.createBranch(targetBranch, commitResponse.sha);
+      await this.createBranch(branchName, commitResponse.sha);
     } catch (e) {
       if (e instanceof APIError && (e.status === 409 || e.status === 422)) {
-        await this.patchBranch(targetBranch, commitResponse.sha);
+        await this.patchBranch(branchName, commitResponse.sha);
       } else {
         throw e;
       }
@@ -419,10 +423,10 @@ export default class API {
 
     if (branchData.protected) {
       const body =
-        options.commitMessage + `\n\n**[Edit this PR](${this.generateEditLink(targetBranch)})**`;
+        options.commitMessage + `\n\n**[Edit this PR](${this.generateEditLink(branchName)})**`;
       try {
-        await this.createPull(targetBranch.replace(/-/g, ' '), body, targetBranch, this.branch);
-        switchBranch(targetBranch);
+        await this.createPull(prTitle, body, branchName, this.branch);
+        switchBranch(branchName);
       } catch (e) {
         if (e instanceof APIError && e.status !== 409 && e.status !== 422) {
           throw e;
