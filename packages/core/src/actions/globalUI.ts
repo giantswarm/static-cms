@@ -6,6 +6,7 @@ import type {ThunkDispatch} from "redux-thunk";
 import type {RootState} from "@staticcms/core/store";
 import type {AnyAction} from "redux";
 import type {PullRequestLike} from "@staticcms/core";
+import type {ThunkAction} from "@reduxjs/toolkit";
 
 export function changeTheme(theme: string) {
   return { type: THEME_CHANGE, payload: theme } as const;
@@ -15,7 +16,7 @@ export function pullOpened(pull: PullRequestLike) {
   return { type: PULL_OPENED, payload: pull } as const;
 }
 
-export function openPullInNewTab(branch: string) {
+export function openPullInNewTab(branch: string): ThunkAction<any, any, any, any> {
   return async (dispatch: ThunkDispatch<RootState, {}, AnyAction>, getState: () => RootState) => {
     const state = getState();
     if (!state.config.config) {
