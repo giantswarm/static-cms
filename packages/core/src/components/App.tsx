@@ -32,7 +32,8 @@ import EditorRoute from './entry-editor/EditorRoute';
 import MediaPage from './media-library/MediaPage';
 import Page from './page/Page';
 import Snackbars from './snackbar/Snackbars';
-import {loadBranches} from '../actions/branches';
+import { loadBranches } from '../actions/branches';
+import { loadPulls } from '../actions/pulls';
 import ThemeManager from './theme/ThemeManager';
 import useTheme from './theme/hooks/useTheme';
 
@@ -74,6 +75,7 @@ const App = ({
   config,
   collections,
   branches,
+  pulls,
   loginUser,
   isFetching,
   t,
@@ -233,6 +235,12 @@ const App = ({
   }, [dispatch, user, isFetching, branches]);
 
   useEffect(() => {
+    if (user && !pulls.isFetching && !pulls.pulls) {
+      dispatch(loadPulls());
+    }
+  }, [dispatch, user, isFetching, pulls]);
+
+  useEffect(() => {
     const defaultTheme = config.config?.theme?.default_theme;
     if (isEmpty(defaultTheme)) {
       return;
@@ -278,7 +286,7 @@ const App = ({
 };
 
 function mapStateToProps(state: RootState) {
-  const { auth, config, collections, branches, globalUI, scroll } = state;
+  const { auth, config, collections, branches, pulls, globalUI, scroll } = state;
   const user = auth.user;
   const isFetching = globalUI.isFetching;
   const scrollSyncEnabled = scroll.isScrolling;
@@ -287,6 +295,7 @@ function mapStateToProps(state: RootState) {
     config,
     collections,
     branches,
+    pulls,
     user,
     isFetching,
     scrollSyncEnabled,
