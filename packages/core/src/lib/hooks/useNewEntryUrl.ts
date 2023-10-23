@@ -1,7 +1,6 @@
 import { useMemo } from 'react';
 
 import { getNewEntryUrl } from '../urlHelper';
-import { isNotEmpty } from '../util/string.util';
 
 import type { Collection } from '@staticcms/core/interface';
 
@@ -15,7 +14,7 @@ export default function useNewEntryUrl(
     }
 
     return 'fields' in collection && collection.create
-      ? `${getNewEntryUrl(collection.name)}${isNotEmpty(filterTerm) ? `/${filterTerm}` : ''}`
+      ? `${getNewEntryUrl(collection.name, filterTerm || '')}`
       : '';
   }, [collection, filterTerm]);
 }
