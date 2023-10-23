@@ -9,6 +9,7 @@ import type { ConfigState } from '../reducers/config';
 import type { BranchesState } from '@staticcms/core/reducers/branches';
 import type { ThunkDispatch } from 'redux-thunk';
 import type { AnyAction } from 'redux';
+import type { PullsState } from "@staticcms/core/reducers/pulls";
 
 const store = configureStore({
   reducer: createRootReducer(),
@@ -22,11 +23,12 @@ const store = configureStore({
 export { store };
 export type RootState<EF extends BaseField = UnknownField> = Omit<
   ReturnType<typeof store.getState>,
-  'collection' | 'config' | 'branches'
+  'collection' | 'config' | 'branches' | 'pulls'
 > & {
   collection: CollectionsState<EF>;
   config: ConfigState<EF>;
   branches: BranchesState;
+  pulls: PullsState;
 };
 export type AppStore = typeof store;
 export type AppDispatch = ThunkDispatch<RootState, any, AnyAction>;

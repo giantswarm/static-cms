@@ -11,12 +11,14 @@ import scroll from './scroll';
 import search from './search';
 import status from './status';
 import branches from './branches';
+import pulls from './pulls';
 
 const reducers = {
   auth,
   collections,
   config,
   branches,
+  pulls,
   cursors,
   entries,
   entryDraft,

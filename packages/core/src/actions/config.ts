@@ -16,6 +16,7 @@ import {
 import { selectDefaultSortableFields } from '../lib/util/collection.util';
 import { store } from '../store';
 import { loadBranches } from '@staticcms/core/actions/branches';
+import { loadPulls } from "@staticcms/core/actions/pulls";
 import { discardDraft, entriesClear } from '@staticcms/core/actions/entries';
 import { authenticateUser } from '@staticcms/core/actions/auth';
 
@@ -148,6 +149,7 @@ export function switchBranch(branch: string) {
     dispatch(discardDraft());
     dispatch(entriesClear());
     dispatch(loadBranches());
+    dispatch(loadPulls());
   };
 
   const loadConfigAction = loadConfig(undefined, function onLoad(config) {
