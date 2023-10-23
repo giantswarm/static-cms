@@ -8,18 +8,27 @@ import { useAppSelector } from '@staticcms/core/store/hooks';
 import Menu from '../common/menu/Menu';
 import MenuGroup from '../common/menu/MenuGroup';
 import MenuItemLink from '../common/menu/MenuItemLink';
+import { customPathFromSlug } from "@staticcms/core/lib/util/nested.util";
 
-import type { TranslatedProps } from '@staticcms/core/interface';
+import type { Collection, TranslatedProps } from '@staticcms/core/interface';
 import type { FC } from 'react';
 import type { MenuProps } from '../common/menu/Menu';
 
-export type QuickCreateProps = Pick<
+export interface QuickCreateProps extends Pick<
   MenuProps,
   'rootClassName' | 'buttonClassName' | 'hideDropdownIcon' | 'hideLabel' | 'variant'
->;
+> {
+  collection?: Collection;
+  slug?: string;
+}
 
-const QuickCreate: FC<TranslatedProps<QuickCreateProps>> = ({ t, ...menuProps }) => {
+const QuickCreate: FC<TranslatedProps<QuickCreateProps>> = ({ t, collection, slug, ...menuProps }) => {
   const collections = useAppSelector(selectCollections);
+
+  const nestedFieldPath = useMemo(
+    () => (collection && slug) ? customPathFromSlug(collection, slug) : '',
+    [collection, slug],
+  );
 
   const createableCollections = useMemo(
     () =>
@@ -38,7 +47,7 @@ const QuickCreate: FC<TranslatedProps<QuickCreateProps>> = ({ t, ...menuProps })
     >
       <MenuGroup>
         {createableCollections.map(collection => (
-          <MenuItemLink key={collection.name} href={getNewEntryUrl(collection.name)}>
+          <MenuItemLink key={collection.name} href={getNewEntryUrl(collection.name, nestedFieldPath)}>
             {collection.label_singular || collection.label}
           </MenuItemLink>
         ))}

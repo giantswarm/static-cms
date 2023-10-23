@@ -38,6 +38,7 @@ interface MainViewProps {
   noScroll?: boolean;
   children: ReactNode;
   collection?: Collection;
+  slug?: string;
 }
 
 const MainView = ({
@@ -49,6 +50,7 @@ const MainView = ({
   noScroll = false,
   navbarActions,
   collection,
+  slug,
 }: MainViewProps) => {
   return (
     <>
@@ -56,6 +58,8 @@ const MainView = ({
         breadcrumbs={breadcrumbs}
         showQuickCreate={showQuickCreate}
         navbarActions={navbarActions}
+        collection={collection}
+        slug={slug}
       />
       <div className={classes.root}>
         {showLeftNav ? <Sidebar /> : null}

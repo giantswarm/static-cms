@@ -447,6 +447,9 @@ const EditorInterface = ({
       breadcrumbs={breadcrumbs}
       noMargin
       showLeftNav={true}
+      showQuickCreate
+      collection={collection}
+      slug={slug}
       noScroll={finalPreviewActive || i18nActive}
       navbarActions={
         <EditorToolbar

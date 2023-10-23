@@ -44,7 +44,6 @@ const SingleCollectionPage: FC<SingleCollectionPageProps> = ({
   return (
     <MainView
       breadcrumbs={breadcrumbs}
-      collection={collection}
       showQuickCreate
       showLeftNav
       noScroll

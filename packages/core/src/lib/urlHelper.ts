@@ -8,6 +8,8 @@ import sanitizeFilename from 'sanitize-filename';
 import url from 'url';
 import urlJoin from 'url-join';
 
+import { isNotEmpty } from "@staticcms/core/lib/util/string.util";
+
 import type { Slug } from '../interface';
 
 function getUrl(urlString: string, direct?: boolean) {
@@ -18,8 +20,8 @@ export function getCollectionUrl(collectionName: string, direct?: boolean) {
   return getUrl(`/collections/${collectionName}`, direct);
 }
 
-export function getNewEntryUrl(collectionName: string, direct?: boolean) {
-  return getUrl(`/collections/${collectionName}/new`, direct);
+export function getNewEntryUrl(collectionName: string, folder: string, direct?: boolean) {
+  return getUrl(`/collections/${collectionName}/new${isNotEmpty(folder) ? `/${folder}` : ''}`, direct);
 }
 
 export function addParams(urlString: string, params: Record<string, string>) {

@@ -14,7 +14,7 @@ import BranchSelect from './BranchSelect';
 import QuickCreate from './QuickCreate';
 import SettingsDropdown from './SettingsDropdown';
 
-import type { Breadcrumb, TranslatedProps } from '@staticcms/core/interface';
+import type { Breadcrumb, Collection, TranslatedProps } from '@staticcms/core/interface';
 import type { FC, ReactNode } from 'react';
 
 import './Navbar.css';
@@ -39,12 +39,16 @@ export interface NavbarProps {
   breadcrumbs?: Breadcrumb[];
   showQuickCreate?: boolean;
   navbarActions?: ReactNode;
+  collection?: Collection;
+  slug?: string;
 }
 
 const Navbar = ({
   showQuickCreate = false,
   navbarActions = null,
   breadcrumbs = [],
+  collection,
+  slug,
 }: TranslatedProps<NavbarProps>) => {
   const dispatch = useAppDispatch();
   const config = useAppSelector(selectConfig);
@@ -92,7 +96,7 @@ const Navbar = ({
             ) : null}
             <BranchSelect />
             {showQuickCreate ? (
-              <QuickCreate key="quick-create" rootClassName={classes['quick-create']} />
+              <QuickCreate key="quick-create" collection={collection} slug={slug} rootClassName={classes['quick-create']} />
             ) : null}
             {navbarActions}
             <SettingsDropdown inEditor={inEditor} />
