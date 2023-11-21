@@ -1,5 +1,6 @@
 import { GitHubBackend } from '@staticcms/core';
 import { LOAD_BRANCHES_FAILURE, LOAD_BRANCHES_REQUEST, LOAD_BRANCHES_SUCCESS } from '../constants';
+import {switchBranch} from "@staticcms/core/actions/config";
 import { currentBackend } from '@staticcms/core/backend';
 
 import type { ThunkDispatch } from 'redux-thunk';
@@ -47,7 +48,15 @@ export function loadBranches() {
     dispatch(branchesLoading());
     try {
       const branches = await gitHubBackend.getBranches();
-      dispatch(branchesLoaded(branches));
+
+      // if the current branch is not in the list of branches, switch to the default branch
+      if (!branches.find((b) => b.name === gitHubBackend.branch)) {
+        const defaultBranch = 'main';
+        console.info(`[StaticCMS] Branch ${gitHubBackend.branch} not found: switching to ${defaultBranch}`);
+        switchBranch(defaultBranch);
+      } else {
+        dispatch(branchesLoaded(branches));
+      }
     } catch (error) {
       console.error(error);
       dispatch(branchesFailed(error as Error));
