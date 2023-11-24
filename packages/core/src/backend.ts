@@ -487,13 +487,13 @@ export class Backend<EF extends BaseField = UnknownField, BC extends BackendClas
     return filteredEntries;
   }
 
-  async listEntries(collection: Collection) {
+  async listEntries(collection: Collection, lazyLoadPredicate?: (path: string) => boolean) {
     const extension = selectFolderEntryExtension(collection);
     let listMethod: () => Promise<ImplementationEntry[]>;
     if ('folder' in collection) {
       listMethod = () => {
         const depth = collectionDepth(collection);
-        return this.implementation.entriesByFolder(collection.folder as string, extension, depth);
+        return this.implementation.entriesByFolder(collection.folder as string, extension, depth, lazyLoadPredicate);
       };
     } else {
       const files = collection.files.map(collectionFile => ({
@@ -526,7 +526,7 @@ export class Backend<EF extends BaseField = UnknownField, BC extends BackendClas
   // repeats the process. Once there is no available "next" action, it
   // returns all the collected entries. Used to retrieve all entries
   // for local searches and queries.
-  async listAllEntries<EF extends BaseField>(collection: Collection<EF>) {
+  async listAllEntries<EF extends BaseField>(collection: Collection<EF>, lazyLoadPredicate?: (path: string) => boolean) {
     if ('folder' in collection && collection.folder && this.implementation.allEntriesByFolder) {
       const depth = collectionDepth(collection);
       const extension = selectFolderEntryExtension(collection);
@@ -536,11 +536,12 @@ export class Backend<EF extends BaseField = UnknownField, BC extends BackendClas
           extension,
           depth,
           collectionRegex(collection),
+          lazyLoadPredicate
         )
         .then(entries => this.processEntries(entries, collection));
     }
 
-    const response = await this.listEntries(collection as Collection);
+    const response = await this.listEntries(collection as Collection, lazyLoadPredicate);
     const { entries } = response;
     let { cursor } = response;
     while (cursor && cursor.actions?.has('next')) {

@@ -601,6 +601,8 @@ collections:
       path: { widget: string, index_file: 'index' }
       # support for Hugo's branch bundles, with index files named _index.md (disabled by default)
       branch_bundle: false
+      # enable lazy loading of nested collections (disabled by default, experimental)
+      lazy_load: false
     fields:
       - label: Title
         name: title
@@ -627,6 +629,7 @@ collections:
           "index_file": "index"
         }
         "branch_bundle": false
+        "lazy_load": false
       },
       "fields": [
         {
@@ -670,6 +673,8 @@ The [Hugo](https://gohugo.io/) static site generator supports a page organizatio
 Under branch bundles, index files are called `_index.md` and sibling markdown files are *rendered* into their own nested directory.
 
 To support branch bundle organization with a specific nested collection, set the `branch_bundle` option to `true`.
+
+For larger sites with nested collection(s) the experimental `lazy_load` option may be set to `true` to avoid loading unreachable entries.
 
 A branch bundles enabled folder structure may looks like this:
 

@@ -71,6 +71,7 @@ const EntriesCollection = ({
 
   const [prevReadyToLoad, setPrevReadyToLoad] = useState(false);
   const [prevCollection, setPrevCollection] = useState(collection);
+  const [prevFilterTerm, setPrevFilterTerm] = useState<string | null>(null);
 
   const groups = useGroups(collection.name);
 
@@ -90,14 +91,17 @@ const EntriesCollection = ({
       collection &&
       !entriesLoaded &&
       readyToLoad &&
-      (!prevReadyToLoad || prevCollection !== collection)
+      (!prevReadyToLoad || prevCollection !== collection) &&
+      (!prevFilterTerm || prevFilterTerm !== filterTerm)
     ) {
-      dispatch(loadEntries(collection));
+      console.log("loadEntriese() EntriesCollection");
+      dispatch(loadEntries(collection, filterTerm || null));
     }
 
     setPrevReadyToLoad(readyToLoad);
     setPrevCollection(collection);
-  }, [collection, dispatch, entriesLoaded, prevCollection, prevReadyToLoad, readyToLoad]);
+    setPrevFilterTerm(filterTerm || null);
+  }, [collection, dispatch, entriesLoaded, prevCollection, prevReadyToLoad, prevFilterTerm, filterTerm, readyToLoad]);
 
   const handleCursorActions = useCallback(
     (action: string) => {

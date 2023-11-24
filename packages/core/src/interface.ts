@@ -239,6 +239,7 @@ interface Nested {
   };
 
   branch_bundle?: boolean;
+  lazy_load?: boolean;
 }
 
 export interface I18nSettings {
@@ -540,6 +541,7 @@ export abstract class BackendClass {
     folder: string,
     extension: string,
     depth: number,
+    lazyLoadPredicate?: (path: string) => boolean,
   ): Promise<ImplementationEntry[]>;
   abstract entriesByFiles(files: ImplementationFile[]): Promise<ImplementationEntry[]>;
 
@@ -562,6 +564,7 @@ export abstract class BackendClass {
     extension: string,
     depth: number,
     pathRegex?: RegExp,
+    lazyLoadPredicate?: (path: string) => boolean,
   ): Promise<ImplementationEntry[]>;
   abstract traverseCursor(
     cursor: Cursor,

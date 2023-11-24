@@ -56,6 +56,7 @@ import createEntry from '../valueObjects/createEntry';
 import { addAssets, getAsset } from './media';
 import { loadMedia } from './mediaLibrary';
 import { waitUntil } from './waitUntil';
+import {customPathFromSlug} from "@staticcms/core/lib/util/nested.util";
 
 import type { NavigateFunction } from 'react-router-dom';
 import type { AnyAction } from 'redux';
@@ -674,7 +675,7 @@ function addAppendActionsToCursor(cursor: Cursor) {
   }));
 }
 
-export function loadEntries(collection: Collection, page = 0) {
+export function loadEntries(collection: Collection, lazyLoadFolder: string | null, page = 0) {
   return async (dispatch: ThunkDispatch<RootState, {}, AnyAction>, getState: () => RootState) => {
     if (collection.isFetching) {
       return;
@@ -693,6 +694,30 @@ export function loadEntries(collection: Collection, page = 0) {
     const backend = currentBackend(configState.config);
 
     const loadAllEntries = 'nested' in collection || hasI18n(collection);
+    let loadPredicate = undefined;
+    if ('nested' in collection && collection.nested?.lazy_load && lazyLoadFolder !== null) {
+      const lazyLoadPath = [collection.folder, lazyLoadFolder].filter(p => !!p).join('/');
+      loadPredicate = (path: string) => {
+        // find length of shared part
+        const length = Math.min(lazyLoadPath.length, path.length);
+        let i = 0
+        for (; i < length && lazyLoadPath[i] === path[i]; ++i)
+          ;
+        const maxDepth = lazyLoadFolder && i == lazyLoadPath.length ? 2 : 1;
+        // count distinct segments
+        let distinctCount = 0;
+        for (; i < path.length; ++i) {
+          if (path[i] === '/') {
+            ++distinctCount;
+          }
+          if (distinctCount > maxDepth) {
+            return false;
+          }
+        }
+        return true;
+      };
+    }
+
     const append = !!(page && !isNaN(page) && page > 0) && !loadAllEntries;
     dispatch(entriesLoading(collection));
 
@@ -703,8 +728,8 @@ export function loadEntries(collection: Collection, page = 0) {
         entries: Entry[];
       } = await (loadAllEntries
         ? // nested collections require all entries to construct the tree
-          backend.listAllEntries(collection).then((entries: Entry[]) => ({ entries }))
-        : backend.listEntries(collection));
+          backend.listAllEntries(collection, loadPredicate).then((entries: Entry[]) => ({ entries }))
+        : backend.listEntries(collection, loadPredicate));
 
       const cleanResponse = {
         ...response,
@@ -783,7 +808,7 @@ export function traverseCollectionCursor(collection: Collection, action: string)
         return;
       }
 
-      return dispatch(loadEntries(collection, nextPage));
+      return dispatch(loadEntries(collection, null, nextPage));
     }
 
     try {
@@ -1005,7 +1030,8 @@ export function persistEntry(
         }
         dispatch(entryPersisted(collection, serializedEntry, newSlug));
         if ('nested' in collection) {
-          await dispatch(loadEntries(collection));
+          const folder = customPathFromSlug(collection, serializedEntry.slug);
+          await dispatch(loadEntries(collection, folder));
         }
         if (entry.slug !== newSlug) {
           await dispatch(loadEntry(collection, newSlug));
