@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react';
+import {useEffect, useMemo, useState} from 'react';
 
 import { loadEntries } from '@staticcms/core/actions/entries';
 import { useAppDispatch } from '@staticcms/core/store/hooks';
@@ -23,13 +23,16 @@ export default function useBreadcrumbs(
 ) {
   const entries = useEntries(collection);
   const dispatch = useAppDispatch();
+  const [prevFilterTerm, setPrevFilterTerm] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!entries || entries.length === 0) {
-      dispatch(loadEntries(collection));
+    if (!prevFilterTerm || prevFilterTerm !== filterTerm) {
+      dispatch(loadEntries(collection, filterTerm || null));
     }
+
+    setPrevFilterTerm(filterTerm || null);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [prevFilterTerm, filterTerm]);
 
   return useMemo(() => {
     const crumbs: Breadcrumb[] = [

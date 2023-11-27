@@ -56,6 +56,7 @@ import createEntry from '../valueObjects/createEntry';
 import { addAssets, getAsset } from './media';
 import { loadMedia } from './mediaLibrary';
 import { waitUntil } from './waitUntil';
+import {customPathFromSlug} from "@staticcms/core/lib/util/nested.util";
 
 import type { NavigateFunction } from 'react-router-dom';
 import type { AnyAction } from 'redux';
@@ -674,7 +675,7 @@ function addAppendActionsToCursor(cursor: Cursor) {
   }));
 }
 
-export function loadEntries(collection: Collection, page = 0) {
+export function loadEntries(collection: Collection, lazyLoadFolder: string | null, page = 0) {
   return async (dispatch: ThunkDispatch<RootState, {}, AnyAction>, getState: () => RootState) => {
     if (collection.isFetching) {
       return;
@@ -693,6 +694,64 @@ export function loadEntries(collection: Collection, page = 0) {
     const backend = currentBackend(configState.config);
 
     const loadAllEntries = 'nested' in collection || hasI18n(collection);
+    let loadPredicate = undefined;
+    if ('nested' in collection && collection.nested?.lazy_load && lazyLoadFolder !== null) {
+      const lazyLoadPath = [collection.folder, lazyLoadFolder].filter(p => !!p).join('/');
+      const indexPathEnd = `/${collection.nested?.path?.index_file || 'index'}.${collection.extension || 'md'}`;
+      const admittedFiles: string[] = [];
+      loadPredicate = (path: string) => {
+        // find length of shared part
+        const length = Math.min(lazyLoadPath.length, path.length);
+        // count shared and distinct segments
+        let iShared = 0
+        let sharedCount = 0;
+        for (; iShared < length && lazyLoadPath[iShared] === path[iShared]; ++iShared) {
+          if (path[iShared] === '/') {
+            ++sharedCount;
+          }
+        }
+        let distinctCount = 0;
+        for (let i = iShared; i < path.length; ++i) {
+          if (path[i] === '/') {
+            ++distinctCount;
+          }
+        }
+
+        let maxDepth = 1;
+        // support gaps in path (nested empty "directories")
+        if (distinctCount > 1) {
+          const prefix = path.slice(0, path.indexOf('/', iShared));
+          if (!admittedFiles.find(p => p.startsWith(prefix))) {
+            // we have no connecting element, assume maximum configured load depth
+            maxDepth = Math.max(collection.nested?.depth || 2, maxDepth);
+          }
+        }
+
+        // select two segments deep if below the current folder
+        if (sharedCount && iShared == lazyLoadPath.length) {
+          maxDepth = Math.max(maxDepth, 2);
+        }
+
+        if (distinctCount > maxDepth) {
+          return false;
+        }
+
+        // don't load non-index siblings of already admitted files
+        if (distinctCount > 1 && !path.endsWith(indexPathEnd)) {
+          const iLastSegment = path.lastIndexOf('/');
+          if (iLastSegment > 0) {
+            const prefix = path.slice(0, iLastSegment + 1);
+            if (iLastSegment > 0 && admittedFiles.find(p => p.startsWith(prefix) && p.indexOf('/', prefix.length) < 0)) {
+              return false;
+            }
+          }
+        }
+
+        admittedFiles.push(path);
+        return true;
+      };
+    }
+
     const append = !!(page && !isNaN(page) && page > 0) && !loadAllEntries;
     dispatch(entriesLoading(collection));
 
@@ -703,8 +762,8 @@ export function loadEntries(collection: Collection, page = 0) {
         entries: Entry[];
       } = await (loadAllEntries
         ? // nested collections require all entries to construct the tree
-          backend.listAllEntries(collection).then((entries: Entry[]) => ({ entries }))
-        : backend.listEntries(collection));
+          backend.listAllEntries(collection, loadPredicate).then((entries: Entry[]) => ({ entries }))
+        : backend.listEntries(collection, loadPredicate));
 
       const cleanResponse = {
         ...response,
@@ -783,7 +842,7 @@ export function traverseCollectionCursor(collection: Collection, action: string)
         return;
       }
 
-      return dispatch(loadEntries(collection, nextPage));
+      return dispatch(loadEntries(collection, null, nextPage));
     }
 
     try {
@@ -1005,7 +1064,8 @@ export function persistEntry(
         }
         dispatch(entryPersisted(collection, serializedEntry, newSlug));
         if ('nested' in collection) {
-          await dispatch(loadEntries(collection));
+          const folder = customPathFromSlug(collection, serializedEntry.slug);
+          await dispatch(loadEntries(collection, folder));
         }
         if (entry.slug !== newSlug) {
           await dispatch(loadEntry(collection, newSlug));

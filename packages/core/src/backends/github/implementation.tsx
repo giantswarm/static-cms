@@ -248,7 +248,7 @@ export default class GitHub implements BackendClass {
     return { cursor, files: pageFiles };
   };
 
-  async entriesByFolder(folder: string, extension: string, depth: number) {
+  async entriesByFolder(folder: string, extension: string, depth: number, lazyLoadPredicate?: (path: string) => boolean) {
     const repoURL = this.api!.originRepoURL;
 
     let cursor: Cursor;
@@ -258,7 +258,7 @@ export default class GitHub implements BackendClass {
         repoURL,
         depth,
       }).then(files => {
-        const filtered = files.filter(file => filterByExtension(file, extension));
+        const filtered = files.filter(file => filterByExtension(file, extension) && (!lazyLoadPredicate || lazyLoadPredicate(file.path)));
         const result = this.getCursorAndFiles(filtered, 1);
         cursor = result.cursor;
         return result.files;
@@ -279,7 +279,8 @@ export default class GitHub implements BackendClass {
     return files;
   }
 
-  async allEntriesByFolder(folder: string, extension: string, depth: number, pathRegex?: RegExp) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async allEntriesByFolder(folder: string, extension: string, depth: number, pathRegex?: RegExp, lazyLoadPredicate?: (path: string) => boolean) {
     const repoURL = this.api!.originRepoURL;
 
     const listFiles = () =>
@@ -288,7 +289,7 @@ export default class GitHub implements BackendClass {
         depth,
       }).then(files =>
         files.filter(
-          file => (!pathRegex || pathRegex.test(file.path)) && filterByExtension(file, extension),
+          file => (!pathRegex || pathRegex.test(file.path)) && filterByExtension(file, extension) && (!lazyLoadPredicate || lazyLoadPredicate(file.path)),
         ),
       );
 
