@@ -56,10 +56,8 @@ export function customPathFromSlug(collection: Collection, slug: string): string
     return '';
   }
 
-  if (collection.nested.path) {
-    if ('nested' in collection && collection.nested?.path) {
-      return slug.replace(new RegExp(`/${collection.nested.path.index_file}$`, 'g'), '');
-    }
+  if ('nested' in collection && collection.nested?.path) {
+    return slug.replace(new RegExp(`/${collection.nested.path.index_file}$`, 'g'), '');
   }
 
   return slug;

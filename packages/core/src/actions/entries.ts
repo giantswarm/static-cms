@@ -697,23 +697,57 @@ export function loadEntries(collection: Collection, lazyLoadFolder: string | nul
     let loadPredicate = undefined;
     if ('nested' in collection && collection.nested?.lazy_load && lazyLoadFolder !== null) {
       const lazyLoadPath = [collection.folder, lazyLoadFolder].filter(p => !!p).join('/');
+      const indexPathEnd = `/${collection.nested?.path?.index_file || 'index'}.${collection.extension || 'md'}`;
+      const admittedFiles: string[] = [];
       loadPredicate = (path: string) => {
         // find length of shared part
         const length = Math.min(lazyLoadPath.length, path.length);
-        let i = 0
-        for (; i < length && lazyLoadPath[i] === path[i]; ++i)
-          ;
-        const maxDepth = lazyLoadFolder && i == lazyLoadPath.length ? 2 : 1;
-        // count distinct segments
+        // count shared and distinct segments
+        let iShared = 0
+        let sharedCount = 0;
+        for (; iShared < length && lazyLoadPath[iShared] === path[iShared]; ++iShared) {
+          if (path[iShared] === '/') {
+            ++sharedCount;
+          }
+        }
         let distinctCount = 0;
-        for (; i < path.length; ++i) {
+        for (let i = iShared; i < path.length; ++i) {
           if (path[i] === '/') {
             ++distinctCount;
           }
-          if (distinctCount > maxDepth) {
-            return false;
+        }
+
+        let maxDepth = 1;
+        // support gaps in path (nested empty "directories")
+        if (distinctCount > 1) {
+          const prefix = path.slice(0, path.indexOf('/', iShared));
+          if (!admittedFiles.find(p => p.startsWith(prefix))) {
+            // we have no connecting element, assume maximum configured load depth
+            maxDepth = Math.max(collection.nested?.depth || 2, maxDepth);
           }
         }
+
+        // select two segments deep if below the current folder
+        if (sharedCount && iShared == lazyLoadPath.length) {
+          maxDepth = Math.max(maxDepth, 2);
+        }
+
+        if (distinctCount > maxDepth) {
+          return false;
+        }
+
+        // don't load non-index siblings of already admitted files
+        if (distinctCount > 1 && !path.endsWith(indexPathEnd)) {
+          const iLastSegment = path.lastIndexOf('/');
+          if (iLastSegment > 0) {
+            const prefix = path.slice(0, iLastSegment + 1);
+            if (iLastSegment > 0 && admittedFiles.find(p => p.startsWith(prefix) && p.indexOf('/', prefix.length) < 0)) {
+              return false;
+            }
+          }
+        }
+
+        admittedFiles.push(path);
         return true;
       };
     }

@@ -91,7 +91,7 @@ const EntriesCollection = ({
       collection &&
       !entriesLoaded &&
       readyToLoad &&
-      (!prevReadyToLoad || prevCollection !== collection) &&
+      (!prevCollection || prevCollection !== collection) &&
       (!prevFilterTerm || prevFilterTerm !== filterTerm)
     ) {
       console.log("loadEntriese() EntriesCollection");

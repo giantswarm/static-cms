@@ -26,8 +26,7 @@ export default function useBreadcrumbs(
   const [prevFilterTerm, setPrevFilterTerm] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!entries || entries.length === 0 || (!prevFilterTerm || prevFilterTerm !== filterTerm)
-    ) {
+    if (!prevFilterTerm || prevFilterTerm !== filterTerm) {
       dispatch(loadEntries(collection, filterTerm || null));
     }
 
