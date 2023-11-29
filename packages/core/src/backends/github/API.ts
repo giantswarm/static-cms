@@ -508,7 +508,7 @@ export default class API {
   }
 
   async getBranches() {
-    const result: ReposGetBranchesResponse = await this.request(`${this.originRepoURL}/branches`);
+    const result: ReposGetBranchesResponse = await this.request(`${this.originRepoURL}/branches?per_page=100`);
     return result;
   }
 

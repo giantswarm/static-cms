@@ -49,10 +49,12 @@ export function loadBranches() {
     try {
       const branches = await gitHubBackend.getBranches();
 
+      const currentBranch = gitHubBackend.branch;
+      const defaultBranch = 'main';
+
       // if the current branch is not in the list of branches, switch to the default branch
-      if (!branches.find((b) => b.name === gitHubBackend.branch)) {
-        const defaultBranch = 'main';
-        console.info(`[StaticCMS] Branch ${gitHubBackend.branch} not found: switching to ${defaultBranch}`);
+      if (currentBranch !== defaultBranch && !branches.find((b) => b.name === currentBranch)) {
+        console.info(`[StaticCMS] Branch ${currentBranch} not found: switching to ${defaultBranch}`);
         switchBranch(defaultBranch);
       } else {
         dispatch(branchesLoaded(branches));
